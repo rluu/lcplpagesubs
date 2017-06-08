@@ -1,0 +1,2285 @@
+
+
+<!DOCTYPE html>
+<!--[if lte IE 8]><html data-ng-app="SUGApp" class="ie8"> <![endif]-->
+<!--[if gte IE 9]>  <html data-ng-app="SUGApp" class="ie9"> <![endif]-->
+<!--[if !IE]><!--> <html data-ng-app="SUGApp">  <!--<![endif]-->
+
+
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<meta charset="utf-8">
+	<title>LCPL Page Subs: Page Shifts - Jul 13 - Jul 26</title>
+	<meta NAME="Author" CONTENT="SignUpGenius">
+	<meta name="description" content="Timesheets due Friday, July 21st.
+
+Please see files below for important information.">
+	<meta NAME="Keywords" CONTENT="">
+	
+	<meta property="fb:app_id" content="1655155231431010" />
+	
+	
+			 <script src="/plugins/jquery-1.7.2.min.js?v=1486577471" type="text/javascript" language="Javascript"></script>
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js?v=1486577471"></script>
+	
+		<!-- Angular Version (1.5.x is preferred) -->
+		<script src="/js/lib/angular/angular.min.js?v=1486577471" type="text/javascript" language="Javascript"></script>
+		<script src="/js/lib/angular/angular-sanitize.min.js?v=1486577471" type="text/javascript" language="Javascript"></script>
+		<script src="/js/lib/angular/angular-route.min.js?v=1486577471" type="text/javascript" language="Javascript"></script>
+		<script src="/js/lib/angular/angular-animate.min.js?v=1486577471" type="text/javascript" language="Javascript"></script>
+		<script src="/js/lib/angular/ng-google-chart.js?v=1486577471" type="text/javascript"></script>
+		
+		    <script src="/js/lib/angular/ui-bootstrap-0.11.0.min.js?v=1486577471" type="text/javascript"></script>
+		
+		<script src="/js/lib/angular/sortable.js" type="text/javascript"></script>
+		<script src="/js/lib/spin/spin.min.js?v=1486577471" type="text/javascript" language="Javascript"></script>
+		<script src="/js/app.js?v=1486577471" type="text/javascript" language="Javascript"></script>
+		
+			<link rel="stylesheet" href="/css/angular/ngModal.css?v=1486577471">
+		
+
+<script>
+	SUGApp.factory( 'globalJSService', function( ){
+		var global = {};
+		global.secureURL = 'https://www.signupgenius.com';
+		global.apiendpoint = 'https://sugapi.signupgenius.com/v1';
+		global.apiv2endpoint = 'https://sugapi.signupgenius.com/v2/t';
+		global.secureS3link = 'https://s3.amazonaws.com/images.signupgenius.com';
+		global.defaultimageURI = 'www.signupgenius.com';
+		global.S3ImagesURI = 'https://s3.amazonaws.com/images.signupgenius.com';
+		global.defaultPortraitID = 0;
+		global.fbAppId = '1655155231431010';
+		return global;
+	});
+
+	SUGApp.factory( 'userService', function( ){
+		var user = {};
+		user.memberid = '0';
+		user.sugtoken = '';
+		user.roleid = '0';
+		user.parentid = '0';
+		user.ownerid = '0'
+		return user;
+	});
+</script>
+
+
+		<script src="/js/directives/profilePic.js?v=1486577471" type="text/javascript" language="Javascript"></script>
+		<script src="/js/services/profilePicService.js?v=1486577471" type="text/javascript" language="Javascript"></script>
+		<script src="/js/lib/ngImgCrop/ng-img-crop.js?v=1486577471" type="text/javascript" language="Javascript"></script>
+		<link href="/css/profilepics/main.css?v=1486577471" rel="stylesheet" type="text/css" />
+		<link href="/js/lib/ngImgCrop/ng-img-crop.css?v=1486577471" rel="stylesheet" type="text/css" />
+		<script src="/js/lib/ga/ng-ga.min.js?v=1486577471" type="text/javascript" language="JavaScript"></script>
+	
+		<script src="/plugins/jquery.magnific-popup.min.js?v=1486577471"></script>
+		<link rel="stylesheet" href="/css/magnific-popup-min.css?v=1486577471">
+	
+		<link rel="stylesheet" href="/css/bootstrap/socialmedia.css?v=1486577471" />
+	<meta property="og:image" content="http://images.signupgenius.com/memberImages/63F540C332916633D808879CE11878F7_40720058.jpg"><meta property="og:title" content="Page Shifts - Jul 13 - Jul 26">
+		
+			<meta title="og:author" content="Loudoun County Public Library">
+		
+			<meta property="og:description" content="Timesheets due Friday, July 21st.
+
+Please see files below for important information.">
+
+	<style>
+	.SUGmain { font-family: Helvetica, Arial, sans-serif; font-size : 12pt;  line-height: 20pt; color: #CF6E0C;}
+	.SUGbold { font-family:Helvetica, Arial, sans-serif; font-size : 12pt; font-weight : bold; line-height: 20pt; color: #CF6E0C;}
+	.SUGbigbold { font-family: Helvetica, Arial, sans-serif; font-size : 12pt; font-weight : bold; line-height: 16pt; color: #CF6E0C;}
+	.SUGsmall {font-family : Arial, Helvetica, sans-serif;font-size : 10pt;line-height: 12pt;color: #CF6E0C;}
+	.SUGheaddate {font-family : Arial, Helvetica, sans-serif;font-size : 10pt;line-height: 12pt;color: #FFFFFF;font-weight:normal;}
+	.SUGhighlight { font-family: Helvetica, Arial, sans-serif; font-size : 12pt; font-weight : bold; line-height: 20pt; color: ;}
+	.SUGsignups { font-family: Helvetica, Arial, sans-serif; font-size : 12pt; font-weight : normal; line-height: 16pt; color: #6E6E6E;}
+	.SUGcomment, .SUGMemberComment {font-family : Arial, Helvetica, sans-serif;font-size : 10pt;line-height: 14pt;color: #6E6E6E; margin-top: 2px;margin-bottom: 4px; display: block;}
+	.SUGicon {color: #6E6E6E; font-size:22px;}
+	.SUGHeaderText {font-size : 28pt; font-weight : 700; letter-spacing : 1.0;color: #6E6E6E; margin-top: 4px; margin-bottom:12px;}
+	a.SUGlink:link {color: #6E6E6E;font-family:  Helvetica, Arial, sans-serif; font-weight : bold; text-decoration:underline;}
+	a.SUGlink:visited {color: #6E6E6E; font-family :  Helvetica, Arial, sans-serif; font-weight : bold;}
+	a.SUGlink:hover {color: #CF6E0C; font-family :  Helvetica, Arial, sans-serif; font-weight : bold;}
+	a.SUGbuttonlink:link {padding: 6px 6px 6px 6px; border:1px solid #CF6E0C; background-color:#6E6E6E; font-family: Helvetica, Arial, sans-serif; font-size:9pt;font-weight:normal;color:#FFFFFF;text-decoration:none; line-height:38px; margin-right: 3px !important;}
+	a.SUGbuttonlink:visited {padding: 6px 6px 6px 6px; border:1px solid #CF6E0C; background-color:#6E6E6E; font-family: Helvetica, Arial, sans-serif; font-size:9pt;font-weight:normal;color:#FFFFFF;text-decoration:none; line-height:38px; margin-right: 3px !important;}
+	a.SUGbuttonlink:hover {padding: 6px 6px 6px 6px; border:1px solid #CF6E0C; background-color:#6E6E6E; font-family: Helvetica, Arial, sans-serif; font-size:9pt;font-weight:normal;color:#FFFFFF;text-decoration:none; line-height:38px; margin-right: 3px !important;}
+	
+	.SUGbuttonContainer { width: 125px !important; padding-top: 5px !important; padding-bottom: 5px !important; }
+	.SUGbutton {padding: 6px 15px 6px 15px; border:1px solid #CF6E0C; background-color:#6E6E6E; font-family: Helvetica, Arial, sans-serif; font-size:11pt;font-weight:700;color:#FFFFFF;background-image: url(/images/spacer.gif);}
+	.SUGcalbutton, .SUGcalbutton:hover, .SUGcalbutton:visited {padding: 5px 6px 5px 6px; border:1px solid #FFFFFF;  font-family: Helvetica, Arial, sans-serif; font-size:10pt;font-weight:700;color:#FFFFFF;background-image: url(/images/spacer.gif);}
+	.SUGcalbutton:hover {background-color: rgba(207,110,12,0.2);text-decoration:none;}
+	.SUGbuttonEditLock {
+		padding: 4px 18px 4px 4px;
+		border:1px solid #CF6E0C;
+		font-family: Helvetica, Arial, sans-serif;
+		font-size:9pt;
+		font-weight:normal;
+		color:#FFFFFF;
+		background: #6E6E6E url('/images/icons/lock-icon-14x14.png') no-repeat right;
+		}
+	table.SUGtableouter {border-width: 2px 2px 2px 2px; border-style: solid solid solid solid; border-color: #CF6E0C #CF6E0C #CF6E0C #CF6E0C; -moz-border-radius: 0px 0px 0px 0px;}
+	td.SUGtableheader {border-width: 1px 1px 1px 1px; padding: 8px 5px 8px 5px; border-style: solid solid solid solid; border-color: #CF6E0C #CF6E0C #CF6E0C #CF6E0C; -moz-border-radius: 0px 0px 0px 0px; font-family: Helvetica, Arial, sans-serif; font-size : 12pt; font-weight : bold; color: #FFFFFF;}
+	td.SUGtableheadersmall {border-width: 1px 1px 1px 1px; padding: 1px 1px 1px 1px; border-style: solid solid solid solid; border-color: #CF6E0C #CF6E0C #CF6E0C #CF6E0C; -moz-border-radius: 0px 0px 0px 0px; font-family: Helvetica, Arial, sans-serif; font-size : 10pt; font-weight : bold; color:#FFFFFF;}
+	td.SUGtable {border-width: 1px 1px 1px 1px; padding: 5px 5px 5px 5px; border-style: solid solid solid solid; border-color: #CF6E0C #CF6E0C #CF6E0C #CF6E0C; -moz-border-radius: 0px 0px 0px 0px;}
+	td.SUGsubtable {border-width: 1px 1px 1px 1px; padding: 5px 5px 5px 5px; border-style: solid solid solid solid; border-color: #6E6E6E #6E6E6E #6E6E6E #6E6E6E; -moz-border-radius: 0px 0px 0px 0px;}
+	
+			#submitfooter {position:fixed; bottom:0; height:65px; width:100%; background-color: #FFFFFF; border-top: 4px solid #CF6E0C; padding-top:6px;}
+			.giantsubmitbutton {background-color: #6E6E6E; color: #FFFFFF; padding-top: 12px; padding-bottom:12px; padding-left: 25px; padding-right: 25px; border:1px solid #CF6E0C; font-size:14pt; font-weight:bold; -moz-box-shadow: 1px 1px #6E6E6E;-webkit-box-shadow: 1px 1px #6E6E6E;box-shadow: 1px 1px #6E6E6E;}
+		
+			body { background-color: #FFFFFF; }
+		
+	</style>
+	
+	<meta name="format-detection" content="telephone=no" />
+	
+
+	<!-- Lato from CDN -->
+	<link href="https://fonts.googleapis.com/css?family=Lato:900" rel="stylesheet">
+
+
+	<link rel="stylesheet" href="/css/bootstrap/sugbootstrap.css?v=1486577471">
+
+	
+		<link rel="stylesheet" href="/css/bootstrap/bootstrap.overrides.css?v=1486577471">
+		<link rel="stylesheet" href="/css/SUGstyle.min.css?v=1495115987">
+	
+	<script src="/js/lib/bootstrap/bootstrap.min.js?v=1486577471"></script>
+
+	<script src="/js/utility.js?v=1486577471"></script>
+
+	<!-- Fixes double click on admin drop menu in admin area ... -->
+	<!-- but throws injector errors on purchases page and non-angular pages - maybe more -->
+	<!-- -->
+	<!-- <script type="text/javascript" src="/js/lib/angular/ui-bootstrap-tpls-0.14.3.min.js?v=1486577471"></script> -->
+	<!-- -->
+
+	<!--[if lt IE 9]>
+	  	<script src="/css/bootstrap/respond.min.js?v=1486577471"></script>
+	  	<script src="/css/bootstrap/html5shiv.min.js?v=1486577471"></script>
+	<![endif]-->
+
+	
+
+	<!-- Viewport limiter for mobile devices - targeting for tablet and above only -->
+	<!-- if device is smaller than 768px, limit it to 768 and allow scaling, otherwise use the native resolution -->
+	<!-- <meta name="viewport" content="width=992, user-scalable=yes"> -->
+	<!--
+	<script type="text/javascript">
+	    var vpw = (screen.width<=767)?'768':'device-width';
+	    document.write('<meta name="viewport" content="width='+vpw+', initial-scale=1.0" >');
+  	</script>
+	-->
+
+</head>
+
+
+<!-- If the page is not responsive to tablet size... lock it to a 992 width -->
+
+	<body class="accommodate-992">
+
+
+<!-- Alerts & announcements -->
+<section class="flash-announcements">
+	<!-- Policy updates -->
+	
+	<!-- Downtime and planned maintenance -->
+	
+</section>
+
+<!-- Header -->
+<header class="no-print">
+	<div class="container">
+
+		<!-- Logo -->
+		<div class="logo"><a href="/"><img src="/images/logo-signupgenius-color.svg" onerror="this.onerror=null; this.src='/images/logo-signupgenius-color.png'" alt="SignUpGenius" /></a></div>
+
+		<!-- Menu trigger -->
+		<!-- No full collapse until fully responsive - currently 768 minimum size -->
+		<!--
+		<div class="menu-trigger">
+			<div class="chzbrgr btn collapsed" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="false" aria-controls="collapseHeader">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="chzbrgr-layer"></span>
+				<span class="chzbrgr-layer"></span>
+				<span class="chzbrgr-layer"></span>
+				<span class="chzbrgr-layer"></span>
+			</div>
+		</div>
+		-->
+
+		<!-- Navigation -->
+		
+		<nav>
+
+			<!-- <div class="collapse navbar-collapse cover-menu" id="main-nav"> -->
+			<div class="cover-menu" id="main-nav">
+
+				<!-- Left side buttons -->
+				<ul class="nav navbar-nav navbar-left">
+					<li><a href="/how">Features</a></li>
+					<li><a href="/pricing">Pricing</a></li>
+					<li class="dropdown nav-dropdown-menu">
+						<a href="" class="dropdown-toggle arrow-up" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" data-disabled="true">More <span class="caret"></span></a>
+						<ul class="dropdown-menu horizontal">
+							<li><a href="/resources">Resources &amp; Tips</a></li>
+							<li><a href="/blog">Blog</a></li>
+							<li><a href="/testimonials">Case Studies</a></li>
+							<li><a href="/webapp">Mobile Web App</a></li>
+							<li><a href="/support">Help</a></li>
+							
+							
+						</ul>
+					</li>
+				</ul>
+
+				<!-- Right Side Buttons -->
+				<!-- Find a sign up -->
+				<ul class="nav navbar-nav navbar-right">
+					
+							<li><a href="https://www.signupgenius.com/register" class="profile" alt="Log In or Register" popover="Log In or Register" popover-placement="bottom" popover-trigger="mouseenter" popover-popup-delay="300"> Log In</a></li>
+						
+
+					<li><a href="https://www.signupgenius.com/findasignup"><span class="glyphicon glyphicon-search"> </span></a></li>
+				</ul>
+
+				<div class="nav navbar-form navbar-right dropdown nav-dropdown-menu">
+
+					
+
+				</div>
+
+				<!-- Create a new sign up, add hidden-xs on mobile -->
+				<div class="navbar-form navbar-right">
+					
+						<a href=" /index.cfm?go=w.Welcome" ><button class="btn btn-green black-shadow-active">Create a Sign Up</button></a>
+					
+				</div>
+
+			</div>
+
+		</nav>
+		
+
+	</div>
+</header>
+
+<!-- Header ad block with hard-coded sample ad -->
+
+
+<div style="">
+<link rel="stylesheet" href="/css/angular/ngModal.css">
+<style>
+	.customModal .modal { overflow : auto; width: 570px; }
+	.customModal .modal-body { min-height: auto; }
+</style>
+
+
+	
+	<div id="SUGContainer" style="background-color: #FFFFFF;">
+		
+		
+
+	<div style="!important;">
+
+		
+		
+<style>
+	.tabGroupWrapper { width:100% !important; position: relative;}
+	.container { padding-top: 0px !important; }
+	.menuContainer { margin-top:-48px; background:transparent; min-width:970px; max-width:1170px; padding-left:0px !important; padding-right:0px !important;}
+	.tabGroupMenu { background-color:#FEFAE0; z-index: 19; height: 107px;}
+	.tabContainer { position:relative; margin:0px; overflow:hidden; padding-top:15px; height:50px; width:88.5% !important; padding-left:0px;padding-right:0px; }
+	.nav-tabs { margin-bottom: 0px !important; border-bottom: none; }
+	.nav-tabs > li { margin-right: 6px; text-align: center; border-radius: 5px 5px 0px 0px !important; margin-bottom: 0px; box-shadow: 2px -2px 3px #999; }
+	.nav-tabs > li:hover { opacity: 1 !important; }
+	.nav-tabs > li > a { border: none !important;}
+	.nav-tabs > li > a:hover { border: none !important;  background: none !important; opacity: 1; }
+	.nav-tabs > li > a > span:hover { opacity: 1 !important; }
+	.list { position:absolute; min-width:auto; position: absolute; z-index: 25; }
+	.list li{ display:table-cell; position:relative; text-align:center; cursor:grab; cursor:-webkit-grab; vertical-align:middle; font-size: 11pt; }
+	.scroller { height: 46px !important; z-index: 30; cursor:pointer; white-space:no-wrap; width: 5% !important; background: transparent; }
+	.scroller-left { height: 46px; text-align:left; }
+	.scroller-left img { border:none; margin-left:22px;margin-top:0px; height:46px; }
+	.scroller-right { height: 46px; text-align:right; }
+	.scroller-right img { border:none;margin-left:-70px;margin-top:0px; height:46px; }
+</style>
+
+<script>
+	var urlid = ''; //global
+	var checkFormChanges = function(url){
+		urlid = url;
+		var itemsChecked = false;
+		var checkboxes = document.getElementsByName('siid');
+		var cblen = checkboxes.length;
+		for (var i=0; i < cblen; i++ ) {
+			if(typeof checkboxes[i].checked != 'undefined' && checkboxes[i].checked == true) {
+				itemsChecked = true;
+				break; 
+			}
+		}
+
+		if( itemsChecked ) 
+			$('#confWindow').modal('show');
+		else 
+			showTab();
+	};
+	
+	var closeModal = function(response){
+		if( response )
+			showTab();
+		$('#confWindow').modal('hide');
+	};
+	
+	var showTab = function(){
+		if( urlid.toString().length )
+			window.location = '/go/' + urlid;
+	};
+	
+</script>
+
+<div class="modal fade" id="confWindow" tabindex="-1" role="dialog" style="display:none;">
+    <div class="modal-dialog" style="">
+        <div class="modal-content">
+            <div class="modal-header">
+            	<h2>Are you sure you want to leave this page?</h2>
+            </div>
+            <div class="modal-body">
+            	You have selected items but have not completed the sign up process. You can only sign up for items on one sign up page at a time. 
+				To complete the sign up process, return to this page and click the "Submit and Sign Up" button at the bottom of the screen. 
+				If you continue to the new sign up page, you will not be signed up for the items you have checked. 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal" onClick="closeModal(false)">RETURN TO THIS PAGE</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal" onClick="closeModal(true)">Continue to New Page and Discard My Items</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tabGroupWrapper" align="center">
+	<div class="row borderBottom tabGroupMenu" align="center" style="box-shadow: 0px -1px 3px #9f9f9f inset;">
+		<div class="col-xs-12" style="vertical-align:bottom !important;">
+			<div class="container" style="min-width:970px; max-width:970px;">
+				
+				
+					<div class="row" style="padding-top:13px;">
+						<div class="col-xs-12" align="center">
+							
+								<span style="font-size:18pt; font-weight:bold;">LCPL Pages</span>
+							
+						</div>
+						
+					</div>
+				
+
+			</div><!-- container -->
+		</div>
+	</div><!-- row -->
+
+	<!-- horizontal -->
+	<div class="container menuContainer">
+		<div class="row">
+	  		<div class="col-xs-1 scroller"><div class="scroller-left"><img src="/images/navigation/left-arrow.png"></div></div>
+			<div class="col-xs-10 tabContainer">
+			    <ul class="nav nav-tabs list" id="myTab">
+				    
+						<li id=""
+							style="	background:#FFFFFF;
+									height: 43px;
+									opacity: .7;
+									margin-top: -12px;
+									border-left: 2px solid #CF6E0C;
+									border-right: 2px solid #CF6E0C;
+									border-top: 2px solid #CF6E0C;
+									
+										box-shadow: 1px -1px 3px #cecece, #9f9f9f 0px -1px 1px inset;
+									
+									">
+							<a class="tabItem" href="#" onClick="javascript:checkFormChanges('4090D4AAEAF2BA7F58-page5')" style="color:#CF6E0C !important; font-weight: bold;">
+								<span> Pages - June - 1 - June 14</span>
+							</a>
+						</li>
+
+					
+						<li id=""
+							style="	background:#FFFFFF;
+									height: 43px;
+									opacity: .7;
+									margin-top: -12px;
+									border-left: 2px solid #CF6E0C;
+									border-right: 2px solid #CF6E0C;
+									border-top: 2px solid #CF6E0C;
+									
+										box-shadow: 1px -1px 3px #cecece, #9f9f9f 0px -1px 1px inset;
+									
+									">
+							<a class="tabItem" href="#" onClick="javascript:checkFormChanges('4090D4AAEAF2BA7F58-page6')" style="color:#CF6E0C !important; font-weight: bold;">
+								<span> Pages - June - 15 - June 28</span>
+							</a>
+						</li>
+
+					
+						<li id=""
+							style="	background:#FFFFFF;
+									height: 43px;
+									opacity: .7;
+									margin-top: -12px;
+									border-left: 2px solid #CF6E0C;
+									border-right: 2px solid #CF6E0C;
+									border-top: 2px solid #CF6E0C;
+									
+										box-shadow: 1px -1px 3px #cecece, #9f9f9f 0px -1px 1px inset;
+									
+									">
+							<a class="tabItem" href="#" onClick="javascript:checkFormChanges('4090D4AAEAF2BA7F58-page7')" style="color:#CF6E0C !important; font-weight: bold;">
+								<span> Pages - June - 29 - July 12</span>
+							</a>
+						</li>
+
+					
+							<style> .borderBottom { border-bottom: 2px solid #CF6E0C; } </style>
+							<!-- used for calculating where the tab is -->
+						
+						<li id="anchor"
+							style="	background:#FFFFFF;
+									height: 45px;
+									opacity: 1;
+									margin-top: -12px;
+									border-left: 2px solid #CF6E0C;
+									border-right: 2px solid #CF6E0C;
+									border-top: 2px solid #CF6E0C;
+									
+										box-shadow: 1px -1px 3px #9f9f9f;
+									
+									">
+							<a class="tabItem" href="#" onClick="javascript:checkFormChanges('4090D4AAEAF2BA7F58-page8')" style="color:#6E6E6E !important; font-weight: bold;">
+								<span> Page Shifts - Jul 13 - Jul 26</span>
+							</a>
+						</li>
+
+					
+				</ul>
+			</div>
+			<div class="col-xs-1 scroller"><div class="scroller-right"><img class="borderBtnBottom" src="/images/navigation/right-arrow.png"></div></div>
+		</div><!-- row -->
+	</div>
+
+</div>
+<script>
+	/* based on happy2deepak horizontal tab script */
+	var getCookie = function(cname) {
+	    var name = cname + "=";
+	    var ca = document.cookie.split(';');
+	    for(var i=0; i<ca.length; i++) {
+	        var c = ca[i];
+	        while (c.charAt(0)==' ') c = c.substring(1);
+	        if (c.indexOf(name) != -1) return c.substring(name.length,c.length);
+	    }
+	    return "";
+	};
+
+	var deleteCookie = function(name) {
+	    document.cookie = name + '=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+	};
+
+	var getListWidth = function(){
+		var totalWidth = 0;
+		var arrList = $('.list li');
+		if( arrList.length == 0 )
+			return 720; // default just case
+	  	arrList.each(function(){
+	    	var itemWidth = $(this).outerWidth();
+	    	totalWidth += itemWidth;
+	  	});
+	  	return totalWidth + 400; // add an extra padding
+	};
+
+	var getHiddenWidth = function(){
+		var tcWidth = $('.tabContainer').outerWidth();
+		var listWidth = getListWidth();
+		var leftPosition = getLeftPosition();
+	  	return ( tcWidth - listWidth - leftPosition );
+	};
+
+	var getLeftPosition = function(){
+	  return $('.list').position().left;
+	};
+
+	var reDrawTabs = function(){
+		var leftPos = getLeftPosition();
+		var leftPosFromCookie = getCookie('leftPos');
+		deleteCookie('leftPos');
+		var leftPosOffset = 0;
+		var countIt = true;
+		var arrList = $('.list li');
+		var listTotalWidth = arrList.length * 4;
+		arrList.each(function(){
+			listTotalWidth += $(this).outerWidth(true);
+			var itemWidth = $(this).outerWidth();
+	    	if( $(this).attr('id') == 'anchor' ){
+	    		countIt = false;
+	    		$(this).attr('id','');
+	    	}
+	    	if( countIt )
+	    		leftPosOffset += itemWidth;
+	  	});
+
+		// reset to true width
+		$(".list").css({"min-width":listTotalWidth+"px"});
+
+	  	leftPosOffset = leftPosOffset > 500 ? -Math.abs( Math.floor(leftPosOffset / 500) * 500 ) : 0;
+		if(leftPosFromCookie == 0 || ( $('.list').outerWidth() < $('.tabContainer').outerWidth() ) )
+			leftPosOffset = 0;
+
+	  	if( leftPosFromCookie == '' && leftPosOffset < 0 && leftPosOffset < leftPosFromCookie )
+		  	$('.list').css('left',leftPosOffset+"px");
+		else if( leftPosFromCookie < 0 )
+			$('.list').css('left',leftPosFromCookie+"px");
+
+		if ( getHiddenWidth() < 0 )
+		  $('.scroller-right').show();
+		else
+		  $('.scroller-right').hide();
+
+		if ( leftPos < 0 || leftPosFromCookie < 0 || leftPosOffset < 0 ) {
+			$('.scroller-left').show();
+		}
+		else {
+		  	$('.item').animate({left:"-="+getLeftPosition()+"px"},'slow');
+			$('.scroller-left').hide();
+		}
+
+	}
+
+	reDrawTabs();
+	var scrolling = false;
+	$('.scroller-right').click(function(event) {
+		if(scrolling)
+	        return;
+    	scrolling = true;
+		var woh = getHiddenWidth();
+		if( woh < -500 )
+			woh = -500;
+		if( getHiddenWidth() == 0 || getHiddenWidth() == woh )
+			$('.scroller-right').fadeOut('slow');
+		$('.scroller-left').fadeIn('slow');
+		$('.list').animate({left:"+="+woh+"px"},'slow',function(){
+			scrolling = false;
+		});
+	});
+
+	$('.scroller-left').click(function(event) {
+		if(scrolling)
+	        return;
+    	scrolling = true;
+		var leftPos = getLeftPosition();
+		if( leftPos < -500 )
+			leftPos = -500;
+		$('.scroller-right').fadeIn('slow');
+		$('.list').animate({left:"-="+leftPos+"px"},'slow',function(){
+			scrolling = false;
+		});
+		if( getLeftPosition() == 0 || getLeftPosition() == leftPos ){
+			$('.scroller-left').fadeOut('slow');
+		}
+	});
+
+	$('.tabItem').click(function(){
+		deleteCookie('leftPos');
+		var leftPos = getLeftPosition(); // initial left position of list
+		var tcCenter = Math.floor( tcWidth / 2 );
+		var tabWidth = $(this).outerWidth();
+		var listPosition = $(this).parent().position().left;
+		var ulLeftHidden = Math.abs( $(this).parent().parent().position().left );
+		var tcWidth = $('.tabContainer').outerWidth() + ulLeftHidden;
+
+		if( listPosition > 0 && listPosition < ulLeftHidden ){
+			leftPos = -Math.abs( ulLeftHidden - (ulLeftHidden - listPosition) - 60 );
+		} else if( (listPosition + tabWidth + 40) > tcWidth ){
+			leftPos = -Math.abs( ulLeftHidden + ( (listPosition + tabWidth) - tcWidth ) + 40 ) ;
+		}
+
+		if( leftPos <= 0 && listPosition > 0)
+			document.cookie = 'leftPos=' + leftPos + '; Path=/;';
+		else
+			document.cookie = "leftPos=0; Path=/;";
+	});
+
+	/*
+	$(window).on('resize',function(e){
+	  	reDrawTabs();
+	});
+	*/
+</script>
+
+				<form action="https://www.signupgenius.com/index.cfm?go=s.signupform" method="post" id="signupForm">
+		
+
+
+<style>
+
+	/* Still current */
+	.tb-shadow {
+	filter: drop-shadow(0 12px 12px  rgba(0, 0, 0, 0.45));
+	}
+
+	.tb-shadow-safari {
+	-webkit-filter: drop-shadow(0 12px 1.5em  rgba(0, 0, 0, 0.35)); /*Fix for Safari's harsh shadow's*/
+	}
+
+	.tb-shadow-half {
+	filter: drop-shadow(0 6px 6px  rgba(0, 0, 0, 0.45));
+	}t
+
+	.tb-shadow-half-safari {
+	-webkit-filter: drop-shadow(0 6px 0.75em  rgba(0, 0, 0, 0.35)); /*Fix for Safari's harsh shadow's*/
+	}
+
+
+
+	.rendering {
+		image-rendering: auto;
+	}
+</style>
+
+<script>
+(function(){
+	var desktopSignup = function($scope, $timeout) {
+
+		$scope.image1 = {};
+		$scope.image2 = {};
+		$scope.image3 = {};
+
+		var ua = navigator.userAgent;
+
+		/* use Chrome's shadow settings */
+		$scope.tbshadow="tb-shadow";
+		$scope.tbshadowhalf="tb-shadow-half";
+
+		if ((ua.indexOf("Safari") > -1) && !(ua.indexOf("Chrome") > -1)) {
+			$scope.tbshadow="tb-shadow-safari";
+			$scope.tbshadowhalf="tb-shadow-safari";
+		}
+
+		
+				$scope.image1 = {"IMAGEPOSITION":1,"IMAGETYPEID":1,"THEMEIMAGE":"http://images.signupgenius.com/memberImages/63F540C332916633D808879CE11878F7_40720058.jpg","PAIRVALUE":"","ISAPPROVED":1,"PAIREDIMAGEFILENAME":"","SERVERFILENAME":"63F540C332916633D808879CE11878F7_40720058.jpg","mainImagePath":"","DISABLED":0,"PAIREDIMAGEID":0,"mobileMemberImage":"http://images.signupgenius.commemberImages/tn_63F540C332916633D808879CE11878F7_40720058.jpg","IMAGECROPCOORDS":[],"IMAGEWIDTH":325,"desktopMemberImage":"http://images.signupgenius.commemberImages/63F540C332916633D808879CE11878F7_40720058.jpg","IMAGECUSTOM":1,"IMAGEHEIGHT":196,"IMAGETYPE":"Main","ID":515544,"THEMEID":2533,"IMAGERATIO":1.7,"CLIENTFILENAME":"LCPL Logo-Color-Web.jpg","PAIREDIMAGEHEIGHT":0,"PAIREDIMAGEWIDTH":0};
+			
+
+		//Displays the MaskView. It's MaskViewController is at the base of this document.
+
+		$scope.displayMaskView = function( originalImageData, MaskViewTitle, imageKey, aspectRatio, coords ){
+			$scope.MaskOpen = true;
+			var confirmationWindow = $modal.open({
+				templateUrl: '/view/tools/prothemeMaskwindow.html?v1.6',
+				controller: MaskViewController,
+				resolve : {
+					originalImageData: function(){ return originalImageData; },
+					MaskViewTitle: function(){ return MaskViewTitle; },
+					aspectRatio: function(){ return aspectRatio; },
+					coords: function(){ return coords; }
+				}
+			});
+
+			confirmationWindow.result
+			.then( function(result){
+				$scope.MaskOpen = false; // Can spawn a new Mask window
+
+				if (result.success) {
+					$scope.createCoordinates(imageKey,result.coordinates, originalImageData);
+				}
+			});
+		};
+
+		$scope.getImageSize = function (key,url) {
+			var image = new Image();
+			image.src = url;
+			image.onload = function() {
+				/* fix for images that do not have images set */
+				$scope[key].IMAGEWIDTH = image.width;
+				$scope[key].IMAGEHEIGHT = image.height;
+			 $scope.createCoordinates(key,$scope[key].IMAGECROPCOORDS);
+			}
+		}
+
+		// This method figures out the placement, and scale of the image inside its container / mask.
+		$scope.createCoordinates = function(imageKey, coordinates) {
+
+			//Vertical align value for Templates 1 and 2 -tb 2/15/17
+			
+				try {
+					$scope.col2height = $('#col2id').height();
+				} catch (e) {
+					$scope.col2height = 350;
+				}
+			
+
+ 			$scope[imageKey].coords = coordinates;
+			$scope[imageKey].containerwidth = $('#' + imageKey).width();
+			$scope[imageKey].containerheight = $('#' + imageKey).height();
+
+			$scope[imageKey].x1 = $scope[imageKey].coords[0];
+			$scope[imageKey].y1 = $scope[imageKey].coords[1];
+			$scope[imageKey].x2 = $scope[imageKey].coords[2];
+			$scope[imageKey].y2 = $scope[imageKey].coords[3];
+			$scope[imageKey].coordw = $scope[imageKey].coords[4];
+			$scope[imageKey].coordh = $scope[imageKey].coords[5];
+
+			//set coordinates
+			$scope[imageKey].width = $scope[imageKey].IMAGEWIDTH;
+			$scope[imageKey].height = $scope[imageKey].IMAGEHEIGHT;
+
+			$scope[imageKey].left = ( $scope[imageKey].containerwidth / $scope[imageKey].coordw ) * $scope[imageKey].x1  * -1;
+			$scope[imageKey].top = ($scope[imageKey].containerheight / $scope[imageKey].coordh) * $scope[imageKey].y1 * -1;
+			$scope[imageKey].newwidth = ( $scope[imageKey].containerwidth / $scope[imageKey].coordw  * $scope[imageKey].width);
+			$scope[imageKey].newheight = ( $scope[imageKey].containerheight / $scope[imageKey].coordh * $scope[imageKey].height);
+		}
+
+
+		$scope.setupCoords = function() {
+
+			if ( $scope.image1 && $scope.image1.IMAGECROPCOORDS) {
+
+				if ($scope.image1.IMAGEHEIGHT < 2 || $scope.image1.IMAGEWIDTH < 2 ) {
+
+					/* if the image size is missing, load the image to get its size and continue there */
+					var imagesize = $scope.getImageSize('image1',$scope.image1.THEMEIMAGE)
+
+				} else {
+					$scope.createCoordinates('image1',$scope.image1.IMAGECROPCOORDS);
+				}
+			}
+
+
+			if ( $scope.image2 && $scope.image2.IMAGECROPCOORDS) {
+				if ($scope.image2.IMAGEHEIGHT < 2 || $scope.image2.IMAGEWIDTH < 2 ) {
+
+					/* if the image size is missing, load the image to get its size and continue there */
+					var imagesize = $scope.getImageSize('image2',$scope.image2.THEMEIMAGE);
+
+				} else {
+					$scope.createCoordinates('image2',$scope.image2.IMAGECROPCOORDS);
+				}
+			}
+
+
+			if ( $scope.image3 && $scope.image3.IMAGECROPCOORDS) {
+				if ($scope.image3.IMAGEHEIGHT < 2 || $scope.image3.IMAGEWIDTH < 2 ) {
+
+					/* if the image size is missing, load the image to get its size and continue there */
+					var imagesize = $scope.getImageSize('image3',$scope.image3.THEMEIMAGE);
+
+				} else {
+
+					$scope.createCoordinates('image3',$scope.image3.IMAGECROPCOORDS);
+				}
+			}
+
+		}
+
+		$scope.setupCoords();
+
+		//** Auto Rescales the crops when the window resizes **//
+		//
+		//This technique can be used for responsive headers
+		$(window).resize(function(){
+
+			$timeout(function() {
+				$scope.setupCoords();
+			},1);
+
+		});
+	};
+	//allows angular to work with script minifiers
+	desktopSignup.$inject = ['$scope','$timeout'];
+
+	//register controller with AngularJS
+	angular.module('SUGApp').controller('desktopSignup', desktopSignup);
+
+}());
+</script>
+
+
+
+	<style>
+		.modal { color: black !important; }
+	</style>
+	
+	<div id="addLockModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h2>Change Lock</h2>
+				</div>
+				<div class="modal-body">
+					<p>The time to sign up for this item / event has ended. Contact the sign up creator for assistance.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="modifyLockModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h2>Change Lock</h2>
+				</div>
+				<div class="modal-body">
+					<p>The time to make changes to this sign up have ended. Contact the sign up creator for assistance.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
+<div ng-controller="desktopSignup">
+	
+	
+		<style>
+			.col-body-100 {
+				width:calc(100% - 350px); /* This works for 325 images */
+			}
+
+			.col-image, .mod-1-image-1 {
+				width:325px;
+				max-width:325px;
+			}
+
+		</style>
+	
+
+<style>
+	/* Image column - inline for this sign up only */
+	.col-image {
+		margin-top:0;
+		margin-right:25px;
+		float:left;
+	}
+
+	.col-body-100 {
+		float:left;
+	}
+</style>
+
+
+	<style>
+	.col-parent {
+		margin-top: 25px;
+	}
+	</style>
+
+	<div class="container">
+
+	<div class="col-parent">
+		
+		<div class="col-image">
+			
+				<!-- We are not using image masks on templates 1-4 -->
+				
+					<div id="image1" data-ng-style="{'line-height': col2height + 'px'}">
+						<img class="mod-1-image-1 zoom-in" src="http://images.signupgenius.com/memberImages/63F540C332916633D808879CE11878F7_40720058.jpg" alt="" border="0" class="zoom-in">
+					</div>
+				
+		</div>
+	</div>
+	
+
+	
+	<div class="col-body-100 SUGmain" id="col2id">
+
+		
+
+			
+			<div class="SUGbold">LCPL Page Subs</div>
+			<h1 class="SUGHeaderText">Page Shifts - Jul 13 - Jul 26</h1>
+
+			
+			
+			<p><strong>Timesheets due Friday, July 21st.</strong></p>
+
+<p>Please see files below for important information.</p>
+
+			<strong>Related files:</strong>
+			
+				<div style="padding: 10px 0 0px 10px;">
+					<div style="float:left; width: 25px;">
+						<a href="/index.cfm?go=s.downloadSignUpResource&eToken=42D1B5A69FA986111F0516062EC29FCDFACEE370AB2D969B56DFB7B2717A65E5B0D107C76DC4EFFDEED9A732BBD4FA71560409D5290DDECBA7CA61" class="SUGlink">
+							<svg width="25" height="20" xmlns="http://www.w3.org/2000/svg">
+								<path stroke="#CF6E0C" fill="#CF6E0C" id="svg_1" d="m19,10c0,-4.97057 -4.02944,-9 -9,-9s-9,4.02943 -9,9s4.02943,9 9,9s9,-4.02944 9,-9zm-16.3125,0c0,-4.03857 3.27393,-7.3125 7.3125,-7.3125s7.3125,3.27393 7.3125,7.3125s-3.27393,7.3125 -7.3125,7.3125s-7.3125,-3.27393 -7.3125,-7.3125zm8.10798,5.29551l4.5,-4.50004c0.43935,-0.43931 0.43935,-1.15162 0,-1.59097s-1.15165,-0.43935 -1.591,0l-2.57948,2.57949l0,-6.284c0,-0.62131 -0.50369,-1.125 -1.125,-1.125s-1.125,0.50369 -1.125,1.125l0,6.284l-2.57949,-2.57952c-0.43935,-0.43935 -1.15169,-0.43935 -1.59104,0c-0.21966,0.21969 -0.32949,0.50762 -0.32949,0.79551c0,0.2879 0.10983,0.57583 0.32949,0.79548l4.5,4.50004c0.43935,0.43931 1.15169,0.43931 1.591,0l0,0l0.00001,0l0,0.00001z"/>
+							</svg>
+						</a>
+					</div>
+					<div width = "415px">
+						<a href="/index.cfm?go=s.downloadSignUpResource&eToken=42D1B5A69FA986111F0516062EC29FCDFACEE370AB2D969B56DFB7B2717A65E5B0D107C76DC4EFFDEED9A732BBD4FA71560409D5290DDECBA7CA61" class="SUGlink">
+							2017 Payroll Calendar.jpg 
+						</a> ( 125KB jpg)<br>
+						
+					</div>
+					<div style="clear:both;"></div>
+				</div>
+			
+				<div style="padding: 10px 0 0px 10px;">
+					<div style="float:left; width: 25px;">
+						<a href="/index.cfm?go=s.downloadSignUpResource&eToken=42D1B5A69FA986111F0516062EC29FCDFACEE370AB2D969B56DFB7B2717A65E5B0D107C76DC4EFFDEED9A732BBD4FA71560409D5290DDCCEA8CE61" class="SUGlink">
+							<svg width="25" height="20" xmlns="http://www.w3.org/2000/svg">
+								<path stroke="#CF6E0C" fill="#CF6E0C" id="svg_1" d="m19,10c0,-4.97057 -4.02944,-9 -9,-9s-9,4.02943 -9,9s4.02943,9 9,9s9,-4.02944 9,-9zm-16.3125,0c0,-4.03857 3.27393,-7.3125 7.3125,-7.3125s7.3125,3.27393 7.3125,7.3125s-3.27393,7.3125 -7.3125,7.3125s-7.3125,-3.27393 -7.3125,-7.3125zm8.10798,5.29551l4.5,-4.50004c0.43935,-0.43931 0.43935,-1.15162 0,-1.59097s-1.15165,-0.43935 -1.591,0l-2.57948,2.57949l0,-6.284c0,-0.62131 -0.50369,-1.125 -1.125,-1.125s-1.125,0.50369 -1.125,1.125l0,6.284l-2.57949,-2.57952c-0.43935,-0.43935 -1.15169,-0.43935 -1.59104,0c-0.21966,0.21969 -0.32949,0.50762 -0.32949,0.79551c0,0.2879 0.10983,0.57583 0.32949,0.79548l4.5,4.50004c0.43935,0.43931 1.15169,0.43931 1.591,0l0,0l0.00001,0l0,0.00001z"/>
+							</svg>
+						</a>
+					</div>
+					<div width = "415px">
+						<a href="/index.cfm?go=s.downloadSignUpResource&eToken=42D1B5A69FA986111F0516062EC29FCDFACEE370AB2D969B56DFB7B2717A65E5B0D107C76DC4EFFDEED9A732BBD4FA71560409D5290DDCCEA8CE61" class="SUGlink">
+							ePay Stub.pdf 
+						</a> ( 291KB pdf)<br>
+						
+					</div>
+					<div style="clear:both;"></div>
+				</div>
+			
+				<div style="padding: 10px 0 0px 10px;">
+					<div style="float:left; width: 25px;">
+						<a href="/index.cfm?go=s.downloadSignUpResource&eToken=42D1B5A69FA986111F0516062EC29FCDFACEE370AB2D969B56DFB7B2717A65E5B0D107C76DC4EFFDEED9A732BBD4FA71560409D5290DDCCFA9C961" class="SUGlink">
+							<svg width="25" height="20" xmlns="http://www.w3.org/2000/svg">
+								<path stroke="#CF6E0C" fill="#CF6E0C" id="svg_1" d="m19,10c0,-4.97057 -4.02944,-9 -9,-9s-9,4.02943 -9,9s4.02943,9 9,9s9,-4.02944 9,-9zm-16.3125,0c0,-4.03857 3.27393,-7.3125 7.3125,-7.3125s7.3125,3.27393 7.3125,7.3125s-3.27393,7.3125 -7.3125,7.3125s-7.3125,-3.27393 -7.3125,-7.3125zm8.10798,5.29551l4.5,-4.50004c0.43935,-0.43931 0.43935,-1.15162 0,-1.59097s-1.15165,-0.43935 -1.591,0l-2.57948,2.57949l0,-6.284c0,-0.62131 -0.50369,-1.125 -1.125,-1.125s-1.125,0.50369 -1.125,1.125l0,6.284l-2.57949,-2.57952c-0.43935,-0.43935 -1.15169,-0.43935 -1.59104,0c-0.21966,0.21969 -0.32949,0.50762 -0.32949,0.79551c0,0.2879 0.10983,0.57583 0.32949,0.79548l4.5,4.50004c0.43935,0.43931 1.15169,0.43931 1.591,0l0,0l0.00001,0l0,0.00001z"/>
+							</svg>
+						</a>
+					</div>
+					<div width = "415px">
+						<a href="/index.cfm?go=s.downloadSignUpResource&eToken=42D1B5A69FA986111F0516062EC29FCDFACEE370AB2D969B56DFB7B2717A65E5B0D107C76DC4EFFDEED9A732BBD4FA71560409D5290DDCCFA9C961" class="SUGlink">
+							Timesheets.pdf 
+						</a> ( 419KB pdf)<br>
+						
+					</div>
+					<div style="clear:both;"></div>
+				</div>
+			
+				<div style="padding: 10px 0 0px 10px;">
+					<div style="float:left; width: 25px;">
+						<a href="/index.cfm?go=s.downloadSignUpResource&eToken=42D1B5A69FA986111F0516062EC29FCDFACEE370AB2D969B56DFB7B2717A65E5B0D107C76DC4EFFDEED9A732BBD4FA71560409D5290ADECBA7CC61" class="SUGlink">
+							<svg width="25" height="20" xmlns="http://www.w3.org/2000/svg">
+								<path stroke="#CF6E0C" fill="#CF6E0C" id="svg_1" d="m19,10c0,-4.97057 -4.02944,-9 -9,-9s-9,4.02943 -9,9s4.02943,9 9,9s9,-4.02944 9,-9zm-16.3125,0c0,-4.03857 3.27393,-7.3125 7.3125,-7.3125s7.3125,3.27393 7.3125,7.3125s-3.27393,7.3125 -7.3125,7.3125s-7.3125,-3.27393 -7.3125,-7.3125zm8.10798,5.29551l4.5,-4.50004c0.43935,-0.43931 0.43935,-1.15162 0,-1.59097s-1.15165,-0.43935 -1.591,0l-2.57948,2.57949l0,-6.284c0,-0.62131 -0.50369,-1.125 -1.125,-1.125s-1.125,0.50369 -1.125,1.125l0,6.284l-2.57949,-2.57952c-0.43935,-0.43935 -1.15169,-0.43935 -1.59104,0c-0.21966,0.21969 -0.32949,0.50762 -0.32949,0.79551c0,0.2879 0.10983,0.57583 0.32949,0.79548l4.5,4.50004c0.43935,0.43931 1.15169,0.43931 1.591,0l0,0l0.00001,0l0,0.00001z"/>
+							</svg>
+						</a>
+					</div>
+					<div width = "415px">
+						<a href="/index.cfm?go=s.downloadSignUpResource&eToken=42D1B5A69FA986111F0516062EC29FCDFACEE370AB2D969B56DFB7B2717A65E5B0D107C76DC4EFFDEED9A732BBD4FA71560409D5290ADECBA7CC61" class="SUGlink">
+							Guidelines for Substitute Pages.pdf 
+						</a> ( 316KB pdf)<br>
+						
+					</div>
+					<div style="clear:both;"></div>
+				</div>
+			
+			<p></p>
+		
+		<table>
+		<tr>
+			<td><strong>Created by:</strong>&nbsp;</td>
+			
+				<td valign="top">
+					
+					<profile-pic dataset='{"id":1,"value":"LP","type":"initials","resource":{"small":"","medium":"","large":"","text":"LP","xlarge":""}}' color='#FFFFFF' bgcolor='#6E6E6E'></profile-pic>
+				</td>
+			
+			<td>&nbsp;Loudoun County Public Library</td>
+			<td>
+				<div style="padding-top:
+				2px;">&nbsp;<a href="http://www.signupgenius.com/index.cfm?go=c.help&eid=0DC3CEDDFCCDFA6D&cs=09B7BADC8FB88B117B7C64735BB79BBA&id=11342378" class="SUGlink"><span class="glyphicon glyphicon-envelope" style="font-size:15px;"><span></a></div>
+			</td>
+		</tr>
+		</table>
+	
+			<div class="row">
+				<div class="col-md-12">
+					
+						<div style="margin-top:18px; padding-top:18px;border-top: 1px solid #6E6E6E;">
+						Already signed up? You can <a href="http://www.signupgenius.com/index.cfm?go=s.EditHelp&urlid=4090d4aaeaf2ba7f58-page8" class="SUGlink">change your sign up</a>.
+						</div>
+					
+				</div>
+			</div>
+		
+
+	</div>
+	
+	<div class="clearfix"></div>
+
+
+	</div>
+
+
+<br/>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<script>
+// header/footer updates for the menu dropdown not to overlay ads
+(function(){
+	$(document).ready(function(){
+		$('.nav-dropdown-menu').on('show.bs.dropdown', function(){
+			$('#SUGContainer').addClass('open-horizontal');
+		});
+
+		$('.nav-dropdown-menu').on('hide.bs.dropdown',function(){
+			$('#SUGContainer').removeClass('open-horizontal');
+		});
+	});
+})();
+</script>
+
+			<div class="container" style="min-width:970px !important;">
+				
+						<noscript>
+						<div style="border: 2px solid red; background-color: white; padding:3px;" class="redmessage">
+						<!-- <div id="qtyLimitMessage" class="alert alert-danger" role="alert"> -->
+							The sign up creator has set a maximum quantity limit of 10 for this sign up.
+							
+						</div>
+						</noscript>
+					<script>
+<!--
+	// This allows you to check the box using the entire button
+	function checkTheBox(siid){
+	  var thischeck = document.getElementById('checkbox' + siid);
+		if (thischeck.checked == true){
+	           thischeck.checked = false;
+	        }else{
+	           thischeck.checked = true;
+	        }
+	}
+	// This resets the hidden field called 'siids' everytime you click a button
+	function checkLIST(siid) {
+		var cboxes = document.getElementsByName('siid');
+		var idlist = '';
+
+		
+			var restrict = restictQuantity( siid );
+		
+
+		if ( !restrict ){
+			for (i = 0; i < cboxes.length; i++) {
+				if (cboxes[i].checked == true) {
+					var tempval = idlist;
+			  		if (tempval == '') {
+						var idlist = cboxes[i].value;
+					} else {
+			  			var idlist = tempval + ',' + cboxes[i].value;
+			  		}
+				}
+			}
+			document.getElementById('siids').value = idlist;
+			saveSelectedToStorage(idlist);
+		}
+		
+		
+	}
+
+	function restictQuantity( siid ){
+		var result = false;
+		
+				// unchecking is always allowed
+				if ( !$('#checkbox'+ siid ).is(':checked') ) { return false };
+
+				if ( $('input:checkbox:checked').length > 10 ){
+					$('#checkbox'+ siid ).attr('checked',false);
+					$('#quantityLimitDialog').modal('show');
+					result = false;
+				}
+			
+		return result;
+	}
+
+	/** temporary storage for selected idlist **/
+	function saveSelectedToStorage( idlist ){
+		if( typeof(Storage) !== "undefined" ){
+			window.sessionStorage.siidList = idlist;
+			console.log(window.sessionStorage.siidList);
+		}
+	}
+	
+	/** this is specific to selected slot IDs **/
+	window.onload = function(){
+		window.sessionStorage.removeItem("calView");
+		if( typeof(Storage) !== "undefined" && ('siidList' in window.sessionStorage) && window.sessionStorage.siidList.toString().length > 0 ){
+			console.log(window.sessionStorage.siidList);
+			var arrSiid = window.sessionStorage.siidList.split(',');
+			for( var i in arrSiid ){
+				var thischeck = document.getElementById('checkbox' + arrSiid[i]);
+				if( !thischeck.checked )
+					thischeck.checked = true;
+			}
+		}		
+	};
+	
+	/** this is specific to selected slot IDs **/
+	window.onbeforeunload = function(e) {
+		if( typeof(Storage) !== "undefined" && ('siidList' in window.sessionStorage) && window.sessionStorage.siidList.toString().length > 0 ){
+			if( !('calView' in window.sessionStorage) || !window.sessionStorage.calView ){
+				window.sessionStorage.removeItem("siidList");
+				console.log('removed list');
+			}
+		}
+			
+	};
+	
+	/** this is specific to selected slot IDs and calendar view **/
+	function setCalView(){
+		window.sessionStorage.calView = true;
+	};
+	
+//  End -->
+</script>
+
+<style>
+	.link_cursor
+	{
+	   cursor: pointer;
+	}
+	.popover-content {
+	    color: #000 !important;
+	}
+	.disabled { opacity: .5; }
+</style>
+<script>
+$(document).ready(function(){
+    // $('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="popover"]').popover();
+});
+</script>
+
+	<input name="URLID" id="URLID" type="hidden" value="4090D4AAEAF2BA7F58-page8" />
+	
+	<input name="useMultiple" type="hidden" value="true" />
+	
+	<input name="siids" id="siids" type="hidden" value=""> 
+
+<table width="100%" cellspacing="0" align="center" class="SUGtableouter">
+	
+		<tr>
+			<td bgcolor="#6E6E6E" height="35" class="SUGtableheader">Date <span class="SUGheaddate">(mm/dd/yyyy)</span></td> 
+						<td bgcolor="#6E6E6E" height="35" class="SUGtableheader">
+							Location
+						</td>
+					
+					<td bgcolor="#6E6E6E" height="35" class="SUGtableheader">Time <span class="SUGheaddate">(EDT)</span></td>
+				
+				
+			<td bgcolor="#6E6E6E" height="35" class="SUGtableheader">
+				
+					<div style="float:right; width:130px; text-align:right;"><a href="/index.cfm?go=s.signup&urlid=4090d4aaeaf2ba7f58-page8&view=calendar" class="SUGcalbutton rounded" onclick="setCalView()"><span class="glyphicon glyphicon-calendar"></span> Calendar View</a></div>
+				Shifts Available
+			</td>
+		</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/13/2017 (Thu.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Gum Spring&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					9:00am - 1:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/14/2017 (Fri.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Ashburn&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					9:00am - 1:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="3" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/15/2017 (Sat.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Ashburn&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					9:00am - 1:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Gum Spring&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					9:00am - 1:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Ashburn&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					1:00pm - 5:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Afternoon </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/16/2017 (Sun.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Gum Spring&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					10:00am - 2:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/17/2017 (Mon.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Ashburn&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					5:00pm - 9:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Evening </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/18/2017 (Tue.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Ashburn&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					1:00pm - 5:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Afternoon </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/19/2017 (Wed.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Ashburn&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					9:00am - 1:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/21/2017 (Fri.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Ashburn&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					9:00am - 1:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="3" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/22/2017 (Sat.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Gum Spring&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					9:00am - 1:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Ashburn&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					1:00pm - 5:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Afternoon </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Gum Spring&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					1:00pm - 5:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Afternoon </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="2" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/23/2017 (Sun.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="2" style="padding-top:10px;">
+						<span class="SUGbigbold">Gum Spring&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					10:00am - 2:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					10:00am - 2:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="2" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/24/2017 (Mon.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Ashburn&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					9:00am - 1:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Gum Spring&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					1:00pm - 5:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Afternoon </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="2" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/25/2017 (Tue.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Ashburn&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					9:00am - 1:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Gum Spring&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					9:00am - 1:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="5" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">07/26/2017 (Wed.)</span></td>
+				
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Ashburn&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					9:00am - 1:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Gum Spring&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					9:00am - 1:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Morning </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="1" style="padding-top:10px;">
+						<span class="SUGbigbold">Ashburn&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					1:00pm - 5:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Afternoon </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+					<td class="SUGtable" valign="top" rowspan="2" style="padding-top:10px;">
+						<span class="SUGbigbold">Gum Spring&nbsp;</span>
+					</td>
+				
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					5:00pm - 9:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Evening </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		
+		
+				<td class="SUGtable" valign="top" style="padding-top:10px;padding-bottom:10px;"><span class="SUGbigbold">
+					5:00pm - 9:00pm &nbsp;</span>
+				</td>
+			
+			
+		<td class="SUGtable" valign="top" width="45%">
+			<table width="100%" cellpadding="2" cellspacing="0">
+			
+			<!-- end output loop w/ group="itemID" -->
+				
+			
+				<tr>
+					<td valign="top" width="48%"  style="padding-top:5px;">
+						<span class="SUGbigbold">Evening </span>
+						
+					</td>
+					<td width="4%" valign="top" >
+						&nbsp;
+					</td>
+					<td valign="top" width="48%" >
+						
+						
+									<div style="padding-top:5px !important;">
+									<span class="SUGsignups">Already filled</span>
+									</div>
+								
+					</td>
+				</tr>
+			 
+			</table>
+		</td>
+	</tr>
+	
+</table>
+
+
+
+
+
+
+
+
+
+
+			</div>
+		
+
+	</div>
+
+
+	
+	
+	<div style="background:transparent;background-color:transparent;height:150px;"></div>
+
+	<div id="submitfooter" align="center">
+		<div class="container">
+			<div class="SUGsmall" style="float: right;  font-size: 9px; opacity: 0.7; text-align: right;">
+				
+				&copy;2017 SignUpGenius.<br>All Rights Reserved.<br>
+				<a href="http://www.signupgenius.com/about/privacy.cfm" class="SUGlink" style="font-size: 9px;">Privacy Policy</a> | <a href="http://www.signupgenius.com/" class="SUGlink" style="font-size: 9px;">Home</a>
+				
+			</div>
+			
+				<h1 style="color: #6E6E6E; margin-top: 16px;" >NO SLOTS AVAILABLE. SIGN UP IS FULL.</h1>
+			
+		</div>
+	</div>
+	</form>
+
+	<div class="modal fade" id="quantityLimitDialog" tabindex="-1" role="dialog" style="display:none;">
+	    <div class="modal-dialog" style="">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	            	<h2>Sign Up Quantity Limit</h2>
+	            </div>
+	            <div class="modal-body">
+		            You have reached the quantity limit setup by the sign up creator. You are not allowed to sign up for more than 10 total items on this sign up
+					
+					.
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-success" data-dismiss="modal" >OK</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+</div>
+
+
+
+<script>
+	var clientCookie = navigator.cookieEnabled;
+	$.get('/model/public/setCookie.cfm',{cookieEnabled:clientCookie})
+		.done( function(result){
+			if( clientCookie && typeof result !== 'undefined' && result != '' ){
+				/**
+				 * this is used for instances where a
+				 * defered email or memberid is set and later be displayed
+				 **/
+				$( "#retargeting" ).append( result );
+			}
+		});
+</script>
+<div id="retargeting" style="display:none;"></div>
+
+
+
+  <!-- Facebook Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+  fbq('init', '1696408607309042');
+  fbq('track', "PageView");</script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1696408607309042&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Facebook Pixel Code -->
+
+  
+
+</body>
+</html>
