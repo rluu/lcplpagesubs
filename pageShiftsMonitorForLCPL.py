@@ -408,9 +408,10 @@ def sendNotificationMessage(newShiftsAvailableForSignup):
 ##############################################################################
 
 if __name__ == "__main__":
-    log.info("##########################################");
-    log.info("# Starting " + sys.argv[0] + ", version " + APP_VERSION);
-    log.info("##########################################");
+    log.info("##########################################################")
+    log.info("# Starting " + APP_NAME + \
+             " (" + sys.argv[0] + "), version " + APP_VERSION)
+    log.info("##########################################################")
 
     initializeDatabase()
     initializeTwilio()
