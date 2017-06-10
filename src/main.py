@@ -34,6 +34,16 @@ APP_DATE = __date__
 # Location of the source directory, based on this script file.
 SRC_DIR = os.path.abspath(sys.path[0])
 
+# Directory where various data resides.  e.g. sqlite database.
+DATA_DIR = \
+    os.path.abspath(os.path.join(SRC_DIR,
+                                 ".." + os.sep + "data"))
+
+# File path of the sqlite database.
+DATABASE_FILENAME = \
+    os.path.abspath(os.path.join(DATA_DIR,
+                                 "lcpl_page_shifts.db")
+
 # Directory where log files will be written.
 LOG_DIR = \
     os.path.abspath(os.path.join(SRC_DIR,
@@ -156,9 +166,11 @@ def getHtmlPages():
     
     htmls = []
 
+    ######################
     # Temporary code for just reading straight from a file.
     html = None
-    with open("4090d4aaeaf2ba7f58-page8", "r") as f:
+    filename = os.path.abspath(os.path.join(DATA_DIR,"4090d4aaeaf2ba7f58-page8")
+    with open(filename, "r") as f:
         html = f.readlines()
     if html is None:
         log.error("Error: No html data.")
@@ -166,6 +178,7 @@ def getHtmlPages():
     else:
         htmls.add(html)
         return htmls
+    ######################
     
     urls = [
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page5",
@@ -180,7 +193,7 @@ def getHtmlPages():
         if 200 <= r.status_code < 300:
             html = r.text
             htmls.append(html)
-        else
+        else:
             log.error("Unexpected HTTP status code: " + r.status_code)
             log.error("Response text is: " + r.text)
             shutdown(1)
@@ -300,7 +313,7 @@ def getNewShiftsAvailableForSignup(currShifts):
                 shift.endTime,
                 shift.description)
     
-        numRows = c.getCount();
+        numRows = cursor.getCount();
         if numRows == 0:
             # Never seen this value before.
             log.debug("shift.status is: " + shift.status)
@@ -320,7 +333,7 @@ def getNewShiftsAvailableForSignup(currShifts):
             conn.commit()
     
         elif numRows == 1:
-            tup = c.fetchone()
+            tup = cursor.fetchone()
             # Compare status.
             statusColumn = 6
             oldStatus = tup[statusColumn]

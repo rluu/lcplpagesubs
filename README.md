@@ -20,7 +20,7 @@ cd lcplpagesubs
 virtualenv --python=`which python3` venv
 source venv/bin/activate
 
-pip install -r pip_requirements.txt
+pip install -r conf/pip_requirements.txt
 ```
 
 ## Running
