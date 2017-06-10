@@ -2,8 +2,22 @@
 lcplpagesubs
 ------------
 
+# Project Name: Page Shifts Monitor For LCPL
+
+## Author: Ryan Luu
+
+## Email: ryanluu@gmail.com
+
+## GitHub URL:
+https://github.com/rluu/lcplpagesubs
+
+## Git Repository URL:
+https://github.com/rluu/lcplpagesubs.git
+
 ## Description:
 
+Monitors the LCPL Page Subs website, sending notifications for newly available
+signup slots.
 
 --
 
@@ -34,7 +48,7 @@ source venv/bin/activate
 export TWILIO_ACCOUNT_SID='YOUR_ACCOUNT_SID'
 export TWILIO_AUTH_TOKEN='YOUR_AUTH_TOKEN'
 
-python3 pageShiftsMonitorForLCPL.py
+python3 main.py
 ```
 
 --
