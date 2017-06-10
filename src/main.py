@@ -312,6 +312,7 @@ def getNewShiftsAvailableForSignup(currShifts):
                 shift.startTime,
                 shift.endTime,
                 shift.description)
+        conn.commit())
     
         numRows = cursor.getCount();
         if numRows == 0:
