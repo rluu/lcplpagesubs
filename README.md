@@ -1,25 +1,13 @@
-------------
-lcplpagesubs
-------------
+# Page Shifts Monitor For LCPL
 
-# Project Name: Page Shifts Monitor For LCPL
-
-## Author: Ryan Luu
-
-## Email: ryanluu@gmail.com
-
-## GitHub URL:
-https://github.com/rluu/lcplpagesubs
-
-## Git Repository URL:
-https://github.com/rluu/lcplpagesubs.git
+Author: Ryan Luu  
+Email: ryanluu@gmail.com  
+GitHub URL: https://github.com/rluu/lcplpagesubs  
+Git Repository URL: https://github.com/rluu/lcplpagesubs.git  
 
 ## Description:
 
-Monitors the LCPL Page Subs website, sending notifications for newly available
-signup slots.
-
---
+Monitors the LCPL Page Subs website, sending text message notifications when there are newly available signup slots.
 
 ## Installation
 
@@ -35,8 +23,6 @@ source venv/bin/activate
 pip install -r pip_requirements.txt
 ```
 
---
-
 ## Running
 
 To run the software:
@@ -51,15 +37,12 @@ export TWILIO_AUTH_TOKEN='YOUR_AUTH_TOKEN'
 python3 main.py
 ```
 
---
-
 ## Dependencies
 
-python3
+- python3
 
-The following python3 dependencies are installed via pip:
+The following python3 dependencies are installed via pip from the pip_requirements.txt file:
 - beautifulsoup4
 - twilio
 - requests
 
---
