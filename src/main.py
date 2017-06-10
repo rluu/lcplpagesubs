@@ -322,12 +322,12 @@ def getNewShiftsAvailableForSignup(currShifts):
 
             crteUtcDttm = datetime.datetime.utcnow().isoformat()
             values = (crteUtcDttm,
-                    self.date,
-                    self.location,
-                    self.startTime,
-                    self.endTime,
-                    self.description,
-                    self.status)
+                    shift.date,
+                    shift.location,
+                    shift.startTime,
+                    shift.endTime,
+                    shift.description,
+                    shift.status)
             cursor.execute("insert into shifts values (?, ?, ?, ?, ?, ?, ?)",
                            values)
             conn.commit()
@@ -345,12 +345,12 @@ def getNewShiftsAvailableForSignup(currShifts):
 
                 crteUtcDttm = datetime.datetime.utcnow().isoformat()
                 values = (crteUtcDttm,
-                        self.date,
-                        self.location,
-                        self.startTime,
-                        self.endTime,
-                        self.description,
-                        self.status)
+                        shift.date,
+                        shift.location,
+                        shift.startTime,
+                        shift.endTime,
+                        shift.description,
+                        shift.status)
                 cursor.execute("insert into shifts values (?, ?, ?, ?, ?, ?, ?)",
                                values)
                 conn.commit()
