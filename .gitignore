@@ -1,3 +1,3 @@
-lcpl_page_shifts.db
 venv
-
+logs
+data/lcpl_page_shifts.db

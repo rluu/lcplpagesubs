@@ -3,7 +3,9 @@
 
 ##############################################################################
 
+import sys
 import os
+import datetime
 import logging
 import logging.handlers
 import logging.config
@@ -11,8 +13,8 @@ import re
 import sqlite3
 import requests
 import time
+import twilio
 from bs4 import BeautifulSoup
-from twilio.rest import TwilioRestClient
  
 ##############################################################################
 # Global variables
@@ -42,7 +44,7 @@ DATA_DIR = \
 # File path of the sqlite database.
 DATABASE_FILENAME = \
     os.path.abspath(os.path.join(DATA_DIR,
-                                 "lcpl_page_shifts.db")
+                                 "lcpl_page_shifts.db"))
 
 # Directory where log files will be written.
 LOG_DIR = \
@@ -113,7 +115,7 @@ def initializeDatabase():
     
     global conn
     global cursor
-    conn = sqlite3.connect("lcpl_page_shifts.db")
+    conn = sqlite3.connect(DATABASE_FILENAME)
     cursor = conn.cursor()
     cursor.execute("create table if not exists shifts " +
         "(crte_utc_dttm text, " +
@@ -153,10 +155,14 @@ def initializeTwilio():
     if sourcePhoneNumber is None:
         log.error("Environment variable was not set: TWILIO_SRC_PHONE_NUMBER")
         shutdown(1)
+    else:
+        log.info("Source phone number is: " + sourcePhoneNumber)
 
     if destinationPhoneNumber is None:
         log.error("Environment variable was not set: TWILIO_DEST_PHONE_NUMBER")
         shutdown(1)
+    else:
+        log.info("Destination phone number is: " + destinationPhoneNumber)
 
         
 def getHtmlPages():
@@ -168,16 +174,18 @@ def getHtmlPages():
 
     ######################
     # Temporary code for just reading straight from a file.
-    html = None
-    filename = os.path.abspath(os.path.join(DATA_DIR,"4090d4aaeaf2ba7f58-page8")
-    with open(filename, "r") as f:
-        html = f.readlines()
-    if html is None:
-        log.error("Error: No html data.")
-        shutdown(1)
-    else:
-        htmls.add(html)
-        return htmls
+    if False:
+        html = None
+        filename = \
+            os.path.abspath(os.path.join(DATA_DIR,"4090d4aaeaf2ba7f58-page8"))
+        with open(filename, "r") as f:
+            html = f.read()
+        if html is None:
+            log.error("Error: No html data.")
+            shutdown(1)
+        else:
+            htmls.append(html)
+            return htmls
     ######################
     
     urls = [
@@ -214,25 +222,48 @@ def getShiftsFromHtml(html):
     
     shifts = []
     soup = BeautifulSoup(html, 'html5lib')
-    mainTable = soup.body.table
+    mainTable = soup.find("table", {"class" : "SUGtableouter"})
+    #log.debug("mainTable is: " + mainTable.prettify())
+    mainTableBody = mainTable.find("tbody")
+
+    lastDateText = None
+    lastLocationText = None
     
     isFirstRow = True
-    for tr in mainTable.children:
-        log.debug("A <tr> of mainTable is: " + tr)
+    for tr in mainTableBody.findAll("tr", recursive=False):
+        #log.debug("A <tr> of mainTableBody is: " + tr.prettify())
+        log.debug("There are " + str(len(tr.findAll("td"))) + " <td> inside this <tr>")
+        log.debug("There are " + str(len(tr.findAll("span"))) + " <span> inside this <tr>")
+            
         if isFirstRow:
+            log.debug("Skipping first row.")
             isFirstRow = False
             continue
+        else:
+            log.debug("Not first row.  Parsing...")
     
-        spans = tr.find_all('span')
-    
-        if (len(spans) != 5):
-            log.error("Unexpected number of spans: " + len(spans))
-            shutdown(1)
-    
+        spans = tr.find_all("span")
+        log.debug("Found " + str(len(spans)) + " spans.")
+
+        if (len(spans) != 3 and len(spans) != 4 and len(spans) != 5):
+            log.warn("Unexpected number of spans: " + str(len(spans)))
+            log.warn("Skipping this <tr>.")
+            continue
+        
         col = 0
-    
+        
         # Date.
-        dateText = spans[col].contents.strip()
+        dateText = None
+        if len(spans) == 5:
+            dateText = spans[col].text.strip()
+            col += 1
+            lastDateText = dateText
+        elif len(spans) == 3 or len(spans) == 4:
+            if lastDateText is not None:
+                dateText = lastDateText
+            else:
+                log.error("Unexpected number of spans when there was no previous date.")
+                shutdown(1)
         if (len(dateText) < 8):
             log.error("Unexpected length of date text: " + dateText)
             shutdown(1)
@@ -245,30 +276,42 @@ def getShiftsFromHtml(html):
 
             log.error("Date text is not MM/dd/yyyy.  Date text is: " + dateText)
             shutdown(1)
-    
+
         # Location.
-        col += 1
-        locationText = spans[col].contents.replace("&nbsp;", " ")
-        locationText = locationText.strip()
+        locationText = None
+        if len(spans) == 5 or len(spans) == 4:
+            locationText = spans[col].text.replace("&nbsp;", " ").strip()
+            col += 1
+            lastLocationText = locationText
+        elif len(spans) == 3:
+            if lastLocationText is not None:
+                locationText = lastLocationText
+            else:
+                log.error("Unexpected number of spans when there was no previous location.")
+                shutdown(1)
+        log.debug("locationText == " + locationText)
     
         # Start Time and End Time.
+        timeText = spans[col].text.replace("&nbsp;", " ")
         col += 1
-        timeText = spans[col].contents.replace("&nbsp;", " ")
         timeText = timeText.strip()
+        log.debug("timeText == " + timeText)
         timeTexts = timeText.split(" - ")
         startTimeText = timeTexts[0]
         endTimeText = timeTexts[1]
+        log.debug("startTimeText == " + startTimeText)
+        log.debug("endTimeText == " + endTimeText)
     
         # Description.
+        descriptionText = spans[col].text.replace("&nbsp;", " ").strip()
         col += 1
-        descriptionText = spans[col].contents.replace("&nbsp;", " ")
-        descriptionText = descriptionText.strip()
+        log.debug("descriptionText == " + descriptionText)
     
     
         # Status.
+        statusText = spans[col].text.replace("&nbsp;", " ").strip()
         col += 1
-        statusText = spans[col].contents.replace("&nbsp;", " ")
-        statusText = statusText.strip()
+        log.debug("statusText == " + statusText)
     
         shift = Shift()
         shift.date = dateText
@@ -279,7 +322,9 @@ def getShiftsFromHtml(html):
         shift.status = statusText
     
         shifts.append(shift)
-        
+        log.debug("Created a Shift.")
+
+    log.debug("Found " + str(len(shifts)) + " total shifts.")
     return shifts
 
 
@@ -300,6 +345,13 @@ def getNewShiftsAvailableForSignup(currShifts):
     newShiftsAvailableForSignup = []
     
     for shift in currShifts:
+        
+        values = (shift.date, 
+                shift.location,
+                shift.startTime,
+                shift.endTime,
+                shift.description)
+            
         cursor.execute("select * from shifts where " + \
                 "shift_date = ? " + \
                 "and location = ? " + \
@@ -307,16 +359,13 @@ def getNewShiftsAvailableForSignup(currShifts):
                 "and end_time = ? " + \
                 "and description = ? " + \
                 "order by crte_utc_dttm desc limit 1",
-                shift.date, 
-                shift.location,
-                shift.startTime,
-                shift.endTime,
-                shift.description)
-        conn.commit())
-    
-        numRows = cursor.getCount();
-        if numRows == 0:
-            # Never seen this value before.
+                values)
+        #conn.commit()
+
+        tups = cursor.fetchall()
+        
+        if len(tups) == 0:
+            # Initial status.
             log.debug("shift.status is: " + shift.status)
             if re.search("sign up", shift.status, re.IGNORECASE):
                 newShiftsAvailableForSignup.append(shift)
@@ -333,9 +382,10 @@ def getNewShiftsAvailableForSignup(currShifts):
                            values)
             conn.commit()
     
-        elif numRows == 1:
-            tup = cursor.fetchone()
+        elif len(tups) == 1:
+            # Status was stored previously for this shift.
             # Compare status.
+            tup = tups[0]
             statusColumn = 6
             oldStatus = tup[statusColumn]
             if shift.status != oldStatus:
@@ -380,7 +430,7 @@ def sendNotificationMessage(newShiftsAvailableForSignup):
     """
 
     endl = "\n"
-    msg = "LCPL Page Shift Update: " + endl + \
+    msg = endl + "LCPL Page Shift Update: " + endl + \
         "There are " + str(len(newShiftsAvailableForSignup)) + \
         " new shifts available for signup at these locations: " + endl
 
@@ -405,7 +455,7 @@ def sendNotificationMessage(newShiftsAvailableForSignup):
     global sourcePhoneNumber
     global destinationPhoneNumber
     
-    client = TwilioRestClient(twilioAccountSid, twilioAuthToken)
+    client = twilio.rest.Client(twilioAccountSid, twilioAuthToken)
 
     log.info("Sending text message from phone number " +
                 sourcePhoneNumber + " to phone number " +
@@ -444,10 +494,14 @@ if __name__ == "__main__":
                 newShiftsAvailableForSignup.extend(\
                     getNewShiftsAvailableForSignup(shifts))
                 
+            log.info("There are " + str(len(newShiftsAvailableForSignup)) + \
+                     " new shifts available for signup since we last checked.")
+            
             if len(newShiftsAvailableForSignup) > 0:
                 sendNotificationMessage(newShiftsAvailableForSignup)
-    
+                
             numSeconds = 60
+            log.debug("Sleeping for " + str(numSeconds) + " seconds ...")
             time.sleep(numSeconds)
         except KeyboardInterrupt:
             log.info("Caught KeyboardInterrupt.  Shutting down cleanly ...")
