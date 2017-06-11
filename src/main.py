@@ -439,6 +439,7 @@ def sendNotificationMessage(newShiftsAvailableForSignup):
     for shift in newShiftsAvailableForSignup:
         if shift.location not in locations:
             locations.append(shift.location)
+    locations.sort()
 
     # Append locations to the msg string.
     isFirstLocation = True
@@ -448,7 +449,8 @@ def sendNotificationMessage(newShiftsAvailableForSignup):
             isFirstLocation = False
         else:
             msg += ", " + location
-            
+    msg += "."
+    
     # Send text message via Twilio.
     global twilioAccountSid
     global twilioAuthToken
