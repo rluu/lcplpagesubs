@@ -390,9 +390,12 @@ def getNewShiftsAvailableForSignup(currShifts):
             statusColumn = 6
             oldStatus = tup[statusColumn]
             if shift.status != oldStatus:
-                log.debug("Status changed from " + oldStatus +
-                          " to " + shift.status)
-                if re.search("sign up", shift.status, re.IGNORECASE):
+                log.info("Status changed from " + oldStatus + \
+                         " to " + shift.status + " for: " + \
+                         str(shift))
+                if re.search("sign up", shift.status, re.IGNORECASE) or \
+                    re.search("signup", shift.status, re.IGNORECASE):
+                    
                     newShiftsAvailableForSignup.append(shift)
 
                 crteUtcDttm = datetime.datetime.utcnow().isoformat()
