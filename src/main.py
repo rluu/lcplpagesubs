@@ -232,8 +232,10 @@ def getShiftsFromHtml(html):
     isFirstRow = True
     for tr in mainTableBody.findAll("tr", recursive=False):
         #log.debug("A <tr> of mainTableBody is: " + tr.prettify())
-        log.debug("There are " + str(len(tr.findAll("td"))) + " <td> inside this <tr>")
-        log.debug("There are " + str(len(tr.findAll("span"))) + " <span> inside this <tr>")
+        log.debug("There are " + str(len(tr.findAll("td"))) + \
+                  " <td> inside this <tr>")
+        log.debug("There are " + str(len(tr.findAll("span"))) + \
+                  " <span> inside this <tr>")
             
         if isFirstRow:
             log.debug("Skipping first row.")
@@ -360,7 +362,6 @@ def getNewShiftsAvailableForSignup(currShifts):
                 "and description = ? " + \
                 "order by crte_utc_dttm desc limit 1",
                 values)
-        #conn.commit()
 
         tups = cursor.fetchall()
         
@@ -430,10 +431,14 @@ def sendNotificationMessage(newShiftsAvailableForSignup):
     """
 
     endl = "\n"
-    msg = endl + "LCPL Page Shift Update: " + endl + \
-        "There are " + str(len(newShiftsAvailableForSignup)) + \
-        " new shifts available for signup at these locations: " + endl
-
+    msg = endl + "LCPL Page Shift Update: " + endl
+    if len(newShiftsAvailableForSignup) == 1:
+        msg += "There is " + str(len(newShiftsAvailableForSignup)) + \
+            " new shift available for signup at: " + endl
+    else:
+        msg += "There are " + str(len(newShiftsAvailableForSignup)) + \
+            " new shifts available for signup at: " + endl
+    
     # Extract unique locations.
     locations = []
     for shift in newShiftsAvailableForSignup:
