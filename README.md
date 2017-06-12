@@ -36,7 +36,8 @@ export TWILIO_AUTH_TOKEN="YOUR_AUTH_TOKEN"
 export TWILIO_SRC_PHONE_NUMBER="+1XXXYYYZZZZ"
 export TWILIO_DEST_PHONE_NUMBER="+1XXXYYYZZZZ"
 
-python3 src/main.py
+cd src
+python3 main.py
 ```
 
 ## Dependencies
