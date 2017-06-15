@@ -75,7 +75,7 @@ destinationPhoneNumber = None
 # See the method initializeAdminEmailAddresses() below.
 adminFromEmailAddress = None
 adminToEmailAddress = None
-adminErrorEmailSendingEnabled = False
+adminErrorEmailSendingEnabled = True
 
 ##############################################################################
 # Classes
@@ -734,7 +734,8 @@ if __name__ == "__main__":
 
     initializeDatabase()
     initializeTwilio()
-
+    initializeAdminEmailAddresses()
+    
     while True:
         try:
             log.info("Getting HTML pages ...")
