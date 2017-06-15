@@ -36,6 +36,8 @@ export TWILIO_AUTH_TOKEN="YOUR_AUTH_TOKEN"
 export TWILIO_SRC_PHONE_NUMBER="+1XXXYYYZZZZ"
 export TWILIO_DEST_PHONE_NUMBER="+1XXXYYYZZZZ"
 
+export LCPL_PAGE_SUBS_ADMIN_EMAIL_ADDRESS="username@example.com"
+
 cd src
 python3 main.py
 ```
@@ -48,4 +50,6 @@ The following python3 dependencies are installed via pip from the pip_requiremen
 - beautifulsoup4
 - twilio
 - requests
+- boto3  (AWS SDK library for Python)
+
 
