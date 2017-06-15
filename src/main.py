@@ -14,6 +14,7 @@ import sqlite3
 import requests
 import time
 import twilio
+import boto3
 from bs4 import BeautifulSoup
  
 ##############################################################################
@@ -70,6 +71,12 @@ twilioAuthToken = None
 sourcePhoneNumber = None
 destinationPhoneNumber = None
 
+# These globals are for sending out admin emails.
+# See the method initializeAdminEmailAddresses() below.
+adminFromEmailAddress = None
+adminToEmailAddress = None
+adminErrorEmailSendingEnabled = False
+
 ##############################################################################
 # Classes
 ##############################################################################
@@ -100,9 +107,55 @@ def shutdown(rc):
     """
     Exits the script, but first flushes all logging handles, etc.
     """
-    
+
+    global adminErrorEmailSendingEnabled
     global conn
     conn.close()
+
+    if rc != 0 and adminErrorEmailSendingEnabled == True:
+        global adminFromEmailAddress
+        global adminToEmailAddress
+        fromEmailAddress = adminFromEmailAddress
+        toEmailAddress = adminToEmailAddress
+        emailSubject = "Application '" + APP_NAME + "' shutdown notification"
+        endl = "<br />"
+        emailBodyHtml = "Hi," + endl + endl + \
+            "This is a notification to the site Admin that application '" + \
+            APP_NAME + "' has quit unexpectedly with non-zero return code: " + \
+            str(rc) + ".  " + \
+            "Please investigate at your earliest convenience.  Thank you." + \
+            endl + endl
+        emailBodyHtml += "-" + APP_NAME
+
+        log.info("Sending notice email to administrator (" + \
+                 toEmailAddress + \
+                 ") regarding error exit (rc == " + str(rc) + ").")
+        
+        client = boto3.client('ses')
+        response = client.send_email(
+            Destination={
+                'ToAddresses': [toEmailAddress],
+                'CcAddresses': [],
+                'BccAddresses': []
+                },
+            Message={
+                'Subject': {
+                    'Data': emailSubject,
+                    'Charset': 'UTF-8'
+                },
+                'Body': {
+                    'Html': {
+                        'Data': emailBodyHtml,
+                        'Charset': 'UTF-8'
+                        }
+                    }
+                },
+            Source=fromEmailAddress,
+            )
+        
+        log.info("Sending email done.")
+        log.info("Response from AWS is: " + str(response))
+        log.info("Now exiting ...")
     logging.shutdown()
     sys.exit(rc)
 
@@ -164,6 +217,32 @@ def initializeTwilio():
     else:
         log.info("Destination phone number is: " + destinationPhoneNumber)
 
+def initializeAdminEmailAddresses():
+    """
+    Initializes the capability of sending admin emails by obtaining the 
+    TO and FROM email addresses from environment variables.  
+    These must be set prior to running this script.
+    """
+
+    global adminFromEmailAddress
+    global adminToEmailAddress
+
+    adminFromEmailAddress = os.environ.get("LCPL_PAGE_SUBS_ADMIN_EMAIL_ADDRESS")
+    adminToEmailAddress = os.environ.get("LCPL_PAGE_SUBS_ADMIN_EMAIL_ADDRESS")
+
+    if adminFromEmailAddress is None:
+        log.error("Environment variable was not set: LCPL_PAGE_SUBS_ADMIN_EMAIL_ADDRESS")
+        shutdown(1)
+    else:
+        log.info("adminFromEmailAddress is: " + adminFromEmailAddress)
+        
+
+    if adminToEmailAddress is None:
+        log.error("Environment variable was not set: LCPL_PAGE_SUBS_ADMIN_EMAIL_ADDRESS")
+        shutdown(1)
+    else:
+        log.info("adminToEmailAddress is: " + adminToEmailAddress)
+
         
 def getHtmlPages():
     """
@@ -189,10 +268,12 @@ def getHtmlPages():
     ######################
     
     urls = [
-        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page5",
+        #"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page5",
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page6",
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page7",
-        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page8"]
+        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page8",
+        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page11",
+	]
 
     for url in urls:
         log.info("Fetching webpage from URL: " + url)
@@ -202,7 +283,7 @@ def getHtmlPages():
             html = r.text
             htmls.append(html)
         else:
-            log.error("Unexpected HTTP status code: " + r.status_code)
+            log.error("Unexpected HTTP status code: " + str(r.status_code))
             log.error("Response text is: " + r.text)
             shutdown(1)
 
@@ -265,6 +346,7 @@ def getShiftsFromHtml(html):
                 dateText = lastDateText
             else:
                 log.error("Unexpected number of spans when there was no previous date.")
+                log.error("HTML data is: " + html)
                 shutdown(1)
         if (len(dateText) < 8):
             log.error("Unexpected length of date text: " + dateText)
@@ -277,6 +359,7 @@ def getShiftsFromHtml(html):
                 (not dateText[6:].isdigit()):
 
             log.error("Date text is not MM/dd/yyyy.  Date text is: " + dateText)
+            log.error("HTML data is: " + html)
             shutdown(1)
 
         # Location.
@@ -290,6 +373,7 @@ def getShiftsFromHtml(html):
                 locationText = lastLocationText
             else:
                 log.error("Unexpected number of spans when there was no previous location.")
+                log.error("HTML data is: " + html)
                 shutdown(1)
         log.debug("locationText == " + locationText)
     
@@ -417,6 +501,50 @@ def getNewShiftsAvailableForSignup(currShifts):
     return newShiftsAvailableForSignup
 
 
+def sendEmailNotificationMessage(newShiftsAvailableForSignup):
+    global adminFromEmailAddress
+    global adminToEmailAddress
+    fromEmailAddress = adminFromEmailAddress
+    toEmailAddress = adminToEmailAddress
+    emailSubject = "Application '" + APP_NAME + "' new shifts notification"
+    endl = "<br />"
+    emailBodyHtml = "Hi," + endl + endl + \
+        "This is a notification from application '" + \
+        APP_NAME + "' that new shifts available for signup.  " + \
+        "Below are the new shifts available for signup:  " + endl + endl
+
+    for shift in newShiftsAvailableForSignup:
+        emailBodyHtml += str(shift) + endl
+        
+    emailBodyHtml += endl + "-" + APP_NAME
+
+    log.info("Sending notice email to: " + toEmailAddress)
+        
+    client = boto3.client('ses')
+    response = client.send_email(
+        Destination={
+            'ToAddresses': [toEmailAddress],
+            'CcAddresses': [],
+            'BccAddresses': []
+            },
+        Message={
+            'Subject': {
+                'Data': emailSubject,
+                'Charset': 'UTF-8'
+            },
+            'Body': {
+                'Html': {
+                    'Data': emailBodyHtml,
+                    'Charset': 'UTF-8'
+                    }
+                }
+            },
+        Source=fromEmailAddress,
+        )
+        
+    log.info("Sending email done.")
+    log.info("Response from AWS is: " + str(response))
+    
 def sendNotificationMessage(newShiftsAvailableForSignup):
     """
     Sends out a text message notifying the user that there are 
@@ -509,6 +637,7 @@ if __name__ == "__main__":
             
             if len(newShiftsAvailableForSignup) > 0:
                 sendNotificationMessage(newShiftsAvailableForSignup)
+                sendEmailNotificationMessage(newShiftsAvailableForSignup)
                 
             numSeconds = 60
             log.debug("Sleeping for " + str(numSeconds) + " seconds ...")
