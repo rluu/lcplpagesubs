@@ -307,7 +307,7 @@ def getShiftsFromHtml(html):
     soup = BeautifulSoup(html, 'html5lib')
     mainTable = soup.find("table", {"class" : "SUGtableouter"})
     if mainTable == None:
-        log.war("Could not find a HTML table with class SUGtableouter, " + \
+        log.warn("Could not find a HTML table with class SUGtableouter, " + \
                   "which is our main table which contains all the shifts." + \
                   "  Please see the HTML log for the HTML encountered.")
         htmlLog.warn("HTML text is: " + html)
