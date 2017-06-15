@@ -62,6 +62,7 @@ LOG_CONFIG_FILE = \
 # For logging.
 logging.config.fileConfig(LOG_CONFIG_FILE)
 log = logging.getLogger("main")
+htmlLog = logging.getLogger("html")
 
 
 # These globals are extracted from environment variables.
@@ -273,6 +274,7 @@ def getHtmlPages():
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page7",
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page8",
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page11",
+        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page12",
         ]
 
     for url in urls:
@@ -304,7 +306,15 @@ def getShiftsFromHtml(html):
     shifts = []
     soup = BeautifulSoup(html, 'html5lib')
     mainTable = soup.find("table", {"class" : "SUGtableouter"})
-    #log.debug("mainTable is: " + mainTable.prettify())
+    if mainTable == None:
+        log.war("Could not find a HTML table with class SUGtableouter, " + \
+                  "which is our main table which contains all the shifts." + \
+                  "  Please see the HTML log for the HTML encountered.")
+        htmlLog.warn("HTML text is: " + html)
+        log.warn("Returning an empty list of shifts for this HTML page.")
+        return shifts
+
+    #htmlLog.debug("mainTable is: " + mainTable.prettify())
     mainTableBody = mainTable.find("tbody")
 
     lastDateText = None
@@ -312,7 +322,7 @@ def getShiftsFromHtml(html):
     
     isFirstRow = True
     for tr in mainTableBody.findAll("tr", recursive=False):
-        #log.debug("A <tr> of mainTableBody is: " + tr.prettify())
+        #htmlLog.debug("A <tr> of mainTableBody is: " + tr.prettify())
         log.debug("There are " + str(len(tr.findAll("td"))) + \
                   " <td> inside this <tr>")
         log.debug("There are " + str(len(tr.findAll("span"))) + \
@@ -342,14 +352,14 @@ def getShiftsFromHtml(html):
                 dateText = lastDateText
                 col -= 1
             else:
-                log.error("Unexpected number of spans when there was no previous date.")
-                log.error("<tr> contents is: " + tr.prettify())
-                log.error("HTML text is: " + html)
+                log.error("Unexpected number of spans when there was no previous date.  Please see the HTML log for the HTML encountered.")
+                htmlLog.error("<tr> contents is: " + tr.prettify())
+                htmlLog.error("HTML text is: " + html)
                 shutdown(1)
         else:
             log.error("Unexpected span text: " + spanText)
-            log.error("<tr> contents is: " + tr.prettify())
-            log.error("HTML text is: " + html)
+            htmlLog.error("<tr> contents is: " + tr.prettify())
+            htmlLog.error("HTML text is: " + html)
             shutdown(1)
         log.debug("dateText == " + dateText)
 
@@ -366,14 +376,16 @@ def getShiftsFromHtml(html):
                 locationText = lastLocationText
                 col -= 1
             else:
-                log.error("Unexpected number of spans when there was no previous location.")
+                log.error("Unexpected number of spans when there was no previous location.  Please see the HTML log for the HTML encountered")
+                htmlLog.error("<tr> contents is: " + tr.prettify())
+                htmlLog.error("HTML text is: " + html)
                 log.error("<tr> contents is: " + tr.prettify())
                 log.error("HTML text is: " + html)
                 shutdown(1)
         else:
             log.error("Unexpected span text: " + spanText)
-            log.error("<tr> contents is: " + tr.prettify())
-            log.error("HTML text is: " + html)
+            htmlLog.error("<tr> contents is: " + tr.prettify())
+            htmlLog.error("HTML text is: " + html)
             shutdown(1)
         log.debug("locationText == " + locationText)
 
@@ -391,8 +403,8 @@ def getShiftsFromHtml(html):
             endTimeText = timeTexts[1].strip()
         else:
             log.error("Unexpected span text: " + spanText)
-            log.error("<tr> contents is: " + tr.prettify())
-            log.error("HTML text is: " + html)
+            htmlLog.error("<tr> contents is: " + tr.prettify())
+            htmlLog.error("HTML text is: " + html)
             shutdown(1)
         log.debug("startTimeText == " + startTimeText)
         log.debug("endTimeText == " + endTimeText)
@@ -405,8 +417,8 @@ def getShiftsFromHtml(html):
             descriptionText = spanText.replace("&nbsp;", " ").strip()
         else:
             log.error("Unexpected span text: " + spanText)
-            log.error("<tr> contents is: " + tr.prettify())
-            log.error("HTML text is: " + html)
+            htmlLog.error("<tr> contents is: " + tr.prettify())
+            htmlLog.error("HTML text is: " + html)
             shutdown(1)
         log.debug("descriptionText == " + descriptionText)
     
@@ -419,8 +431,8 @@ def getShiftsFromHtml(html):
             statusText = spanText.replace("&nbsp;", " ").strip()
         else:
             log.error("Unexpected span text: " + spanText)
-            log.error("<tr> contents is: " + tr.prettify())
-            log.error("HTML text is: " + html)
+            htmlLog.error("<tr> contents is: " + tr.prettify())
+            htmlLog.error("HTML text is: " + html)
             shutdown(1)
         log.debug("statusText == " + statusText)
 
@@ -738,13 +750,19 @@ if __name__ == "__main__":
     
     while True:
         try:
-            log.info("Getting HTML pages ...")
+            log.info("Fetching HTML pages ...")
             htmlPages = getHtmlPages()
-            log.info("Getting HTML pages done.")
+            log.info("Fetching HTML pages done.  " + \
+                     "Got " + str(len(htmlPages)) + " HTML pages total.")
             
             newShiftsAvailableForSignup = []
-            
-            for htmlPage in htmlPages:
+
+            for i in range(len(htmlPages)):
+                htmlPage = htmlPages[i]
+                
+                log.info("Getting shifts from HTML page (i == " + \
+                         str(i) + ") ...")
+                         
                 shifts = getShiftsFromHtml(htmlPage)
             
                 newShiftsAvailableForSignup.extend(\
