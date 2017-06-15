@@ -31,9 +31,12 @@ To run the software:
 cd lcplpagesubs
 source venv/bin/activate
 
-export TWILIO_ACCOUNT_SID='YOUR_ACCOUNT_SID'
-export TWILIO_AUTH_TOKEN='YOUR_AUTH_TOKEN'
+export TWILIO_ACCOUNT_SID="YOUR_ACCOUNT_SID"
+export TWILIO_AUTH_TOKEN="YOUR_AUTH_TOKEN"
+export TWILIO_SRC_PHONE_NUMBER="+1XXXYYYZZZZ"
+export TWILIO_DEST_PHONE_NUMBER="+1XXXYYYZZZZ"
 
+cd src
 python3 main.py
 ```
 
