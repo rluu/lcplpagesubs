@@ -13,8 +13,8 @@ import re
 import sqlite3
 import requests
 import time
-import twilio
 import boto3
+from twilio.rest import Client
 from bs4 import BeautifulSoup
  
 ##############################################################################
@@ -328,81 +328,113 @@ def getShiftsFromHtml(html):
         spans = tr.find_all("span")
         log.debug("Found " + str(len(spans)) + " spans.")
 
-        if (len(spans) != 3 and len(spans) != 4 and len(spans) != 5):
-            log.warn("Unexpected number of spans: " + str(len(spans)))
-            log.warn("Skipping this <tr>.")
-            continue
-        
         col = 0
         
         # Date.
         dateText = None
-        if len(spans) == 5:
-            dateText = spans[col].text.strip()
-            col += 1
+        spanText = spans[col].text.upper().strip()
+        col += 1
+        if isSpanTextADateField(spanText):
+            dateText = spanText[:8]
             lastDateText = dateText
-        elif len(spans) == 3 or len(spans) == 4:
+        elif isSpanTextALocationField(spanText) or isSpanTextATimeField(spanText):
             if lastDateText is not None:
                 dateText = lastDateText
+                col -= 1
             else:
                 log.error("Unexpected number of spans when there was no previous date.")
                 log.error("<tr> contents is: " + tr.prettify())
                 log.error("HTML text is: " + html)
                 shutdown(1)
-        if (len(dateText) < 8):
-            log.error("Unexpected length of date text: " + dateText)
-            log.error("HTML text is: " + html)
-            shutdown(1)
-        dateText = dateText[:8]
-        if dateText[2] != "/" or \
-                dateText[5] != "/" or \
-                (not dateText[:2].isdigit()) or \
-                (not dateText[3:5].isdigit()) or \
-                (not dateText[6:].isdigit()):
-
-            log.error("Date text is not MM/dd/yyyy.  Date text is: " + dateText)
+        else:
+            log.error("Unexpected span text: " + spanText)
             log.error("<tr> contents is: " + tr.prettify())
             log.error("HTML text is: " + html)
             shutdown(1)
+        log.debug("dateText == " + dateText)
+
 
         # Location.
         locationText = None
-        if len(spans) == 5 or len(spans) == 4:
-            locationText = spans[col].text.replace("&nbsp;", " ").strip()
-            col += 1
+        spanText = spans[col].text.upper().strip()
+        col += 1
+        if isSpanTextALocationField(spanText):
+            locationText = spanText.replace("&nbsp;", " ").strip()
             lastLocationText = locationText
-        elif len(spans) == 3:
+        elif isSpanTextATimeField(spanText):
             if lastLocationText is not None:
                 locationText = lastLocationText
+                col -= 1
             else:
                 log.error("Unexpected number of spans when there was no previous location.")
                 log.error("<tr> contents is: " + tr.prettify())
                 log.error("HTML text is: " + html)
                 shutdown(1)
+        else:
+            log.error("Unexpected span text: " + spanText)
+            log.error("<tr> contents is: " + tr.prettify())
+            log.error("HTML text is: " + html)
+            shutdown(1)
         log.debug("locationText == " + locationText)
-    
+
+
         # Start Time and End Time.
-        timeText = spans[col].text.replace("&nbsp;", " ")
+        startTimeText = None
+        endTimeText = None
+        spanText = spans[col].text.upper().strip()
         col += 1
-        timeText = timeText.strip()
-        log.debug("timeText == " + timeText)
-        timeTexts = timeText.split(" - ")
-        startTimeText = timeTexts[0]
-        endTimeText = timeTexts[1]
+        if isSpanTextATimeField(spanText):
+            timeText = spanText.replace("&nbsp;", " ").strip()
+            log.debug("timeText == " + timeText)
+            timeTexts = timeText.split(" - ")
+            startTimeText = timeTexts[0].strip()
+            endTimeText = timeTexts[1].strip()
+        else:
+            log.error("Unexpected span text: " + spanText)
+            log.error("<tr> contents is: " + tr.prettify())
+            log.error("HTML text is: " + html)
+            shutdown(1)
         log.debug("startTimeText == " + startTimeText)
         log.debug("endTimeText == " + endTimeText)
     
         # Description.
-        descriptionText = spans[col].text.replace("&nbsp;", " ").strip()
+        descriptionText = None
+        spanText = spans[col].text.upper().strip()
         col += 1
+        if isSpanTextADescriptionField(spanText):
+            descriptionText = spanText.replace("&nbsp;", " ").strip()
+        else:
+            log.error("Unexpected span text: " + spanText)
+            log.error("<tr> contents is: " + tr.prettify())
+            log.error("HTML text is: " + html)
+            shutdown(1)
         log.debug("descriptionText == " + descriptionText)
     
     
         # Status.
-        statusText = spans[col].text.replace("&nbsp;", " ").strip()
+        statusText = None
+        spanText = spans[col].text.upper().strip()
         col += 1
+        if isSpanTextAStatusField(spanText):
+            statusText = spanText.replace("&nbsp;", " ").strip()
+        else:
+            log.error("Unexpected span text: " + spanText)
+            log.error("<tr> contents is: " + tr.prettify())
+            log.error("HTML text is: " + html)
+            shutdown(1)
         log.debug("statusText == " + statusText)
-    
+
+        # Do cleanup of the statusText if possible.
+        if re.search("sign up", statusText, re.IGNORECASE):
+            statusText = "SIGN UP"
+            log.debug("Cleaned up the statusText to: " + statusText)
+        elif re.search("already filled", statusText, re.IGNORECASE):
+            statusText = "ALREADY FILLED"
+            log.debug("Cleaned up the statusText to: " + statusText)
+        else:
+            log.debug("No status text cleanup")
+
+            
         shift = Shift()
         shift.date = dateText
         shift.location = locationText
@@ -412,10 +444,91 @@ def getShiftsFromHtml(html):
         shift.status = statusText
     
         shifts.append(shift)
-        log.debug("Created a Shift.")
+        log.debug("Created a Shift.  " + \
+                  "There are now " + str(len(shifts)) + " shifts.")
 
     log.debug("Found " + str(len(shifts)) + " total shifts.")
     return shifts
+
+
+def isSpanTextADateField(spanText):
+    dateText = spanText
+    if (len(dateText) < 8):
+        log.debug("Date text should not be less than 8 characters: " + dateText)
+        return False
+    
+    dateText = dateText[:8]
+    
+    if dateText[2] != "/" or \
+            dateText[5] != "/" or \
+            (not dateText[:2].isdigit()) or \
+            (not dateText[3:5].isdigit()) or \
+            (not dateText[6:].isdigit()):
+        
+        log.debug("Date text should be in MM/dd/yyyy.  Date text is: " + \
+                  dateText)
+        return False
+
+    return True
+
+def isSpanTextALocationField(spanText):
+    locationText = spanText.replace("&nbsp;", " ").strip()
+    if bool(re.search(r'\d', locationText)):
+        log.debug("Location text is not expected to have numbers: " + \
+                  locationText)
+        return False
+    elif locationText.find("-") != -1:
+        log.debug("Location text is not expected to have hyphens: " + \
+                  locationText)
+        return False
+    else:
+        return True
+
+def isSpanTextATimeField(spanText):
+    timeText = spanText.replace("&nbsp;", " ").strip()
+    if timeText.find("-") == -1:
+        log.debug("Expected to find a hyphen in the time text: " + \
+                  timeText)
+        return False
+        
+    timeTexts = timeText.split(" - ")
+    if len(timeTexts) != 2:
+        log.debug("Expected to split to 2 str objects: " + \
+                  timeText)
+        return False
+        
+    startTimeText = timeTexts[0].strip()
+    if startTimeText.find(":") == -1:
+        log.debug("Expected to find a : in the startTimeText: " + \
+                  startTimeText)
+        return False
+    
+    endTimeText = timeTexts[1].strip()
+    if endTimeText.find(":") == -1:
+        log.debug("Expected to find a : in the endTimeText: " + \
+                  endTimeText)
+        return False
+
+    return True
+
+def isSpanTextADescriptionField(spanText):
+    descriptionText = spanText.replace("&nbsp;", " ").strip()
+    if bool(re.search(r'\d', descriptionText)):
+        log.debug("Description text is not expected to have numbers: " + \
+                  descriptionText)
+        return False
+    elif descriptionText.find("-") != -1:
+        log.debug("Description text is not expected to have hyphens: " + \
+                  descriptionText)
+        return False
+    else:
+        if descriptionText not in ("MORNING", "AFTERNOON", "EVENING"):
+            log.warn("Unusual descriptionText encountered: " + descriptionText)
+        return True
+
+    
+def isSpanTextAStatusField(spanText):
+    return True
 
 
 def getNewShiftsAvailableForSignup(currShifts):
@@ -597,7 +710,7 @@ def sendNotificationMessage(newShiftsAvailableForSignup):
     global sourcePhoneNumber
     global destinationPhoneNumber
     
-    client = twilio.rest.Client(twilioAccountSid, twilioAuthToken)
+    client = Client(twilioAccountSid, twilioAuthToken)
 
     log.info("Sending text message from phone number " +
                 sourcePhoneNumber + " to phone number " +
