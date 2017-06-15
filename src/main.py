@@ -189,10 +189,12 @@ def getHtmlPages():
     ######################
     
     urls = [
-        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page5",
+#        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page5",
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page6",
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page7",
-        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page8"]
+        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page8",
+        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page11",
+        ]
 
     for url in urls:
         log.info("Fetching webpage from URL: " + url)
@@ -265,6 +267,7 @@ def getShiftsFromHtml(html):
                 dateText = lastDateText
             else:
                 log.error("Unexpected number of spans when there was no previous date.")
+                log.error("<tr> contents is: " + tr.prettify())
                 log.error("HTML text is: " + html)
                 shutdown(1)
         if (len(dateText) < 8):
@@ -279,6 +282,7 @@ def getShiftsFromHtml(html):
                 (not dateText[6:].isdigit()):
 
             log.error("Date text is not MM/dd/yyyy.  Date text is: " + dateText)
+            log.error("<tr> contents is: " + tr.prettify())
             log.error("HTML text is: " + html)
             shutdown(1)
 
@@ -293,6 +297,7 @@ def getShiftsFromHtml(html):
                 locationText = lastLocationText
             else:
                 log.error("Unexpected number of spans when there was no previous location.")
+                log.error("<tr> contents is: " + tr.prettify())
                 log.error("HTML text is: " + html)
                 shutdown(1)
         log.debug("locationText == " + locationText)
