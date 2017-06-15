@@ -202,7 +202,7 @@ def getHtmlPages():
             html = r.text
             htmls.append(html)
         else:
-            log.error("Unexpected HTTP status code: " + r.status_code)
+            log.error("Unexpected HTTP status code: " + str(r.status_code))
             log.error("Response text is: " + r.text)
             shutdown(1)
 
@@ -265,9 +265,11 @@ def getShiftsFromHtml(html):
                 dateText = lastDateText
             else:
                 log.error("Unexpected number of spans when there was no previous date.")
+                log.error("HTML text is: " + html)
                 shutdown(1)
         if (len(dateText) < 8):
             log.error("Unexpected length of date text: " + dateText)
+            log.error("HTML text is: " + html)
             shutdown(1)
         dateText = dateText[:8]
         if dateText[2] != "/" or \
@@ -277,6 +279,7 @@ def getShiftsFromHtml(html):
                 (not dateText[6:].isdigit()):
 
             log.error("Date text is not MM/dd/yyyy.  Date text is: " + dateText)
+            log.error("HTML text is: " + html)
             shutdown(1)
 
         # Location.
@@ -290,6 +293,7 @@ def getShiftsFromHtml(html):
                 locationText = lastLocationText
             else:
                 log.error("Unexpected number of spans when there was no previous location.")
+                log.error("HTML text is: " + html)
                 shutdown(1)
         log.debug("locationText == " + locationText)
     
