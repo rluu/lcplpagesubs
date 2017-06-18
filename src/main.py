@@ -78,6 +78,9 @@ adminFromEmailAddress = None
 adminToEmailAddress = None
 adminErrorEmailSendingEnabled = True
 
+# These globals are for sending out alert email addresses.
+alertToEmailAddresses = None
+
 ##############################################################################
 # Classes
 ##############################################################################
@@ -228,6 +231,7 @@ def initializeAdminEmailAddresses():
     global adminFromEmailAddress
     global adminToEmailAddress
 
+    # This is a single email address.
     adminFromEmailAddress = os.environ.get("LCPL_PAGE_SUBS_ADMIN_EMAIL_ADDRESS")
     adminToEmailAddress = os.environ.get("LCPL_PAGE_SUBS_ADMIN_EMAIL_ADDRESS")
 
@@ -243,6 +247,26 @@ def initializeAdminEmailAddresses():
         shutdown(1)
     else:
         log.info("adminToEmailAddress is: " + adminToEmailAddress)
+
+        
+def initializeAlertEmailAddresses():
+    """
+    Initializes the capability of sending alert emails by obtaining the 
+    TO and FROM email addresses from environment variables.  
+    These must be set prior to running this script.
+    """
+
+    global alertToEmailAddresses
+
+    # This is a comma-separated-value string of email addresses.
+    alertToEmailAddressesStr = os.environ.get("LCPL_PAGE_SUBS_ALERT_EMAIL_ADDRESSES")
+
+    if alertToEmailAddressesStr is None:
+        log.error("Environment variable was not set: LCPL_PAGE_SUBS_ALERT_EMAIL_ADDRESSES")
+        shutdown(1)
+    else:
+        alertToEmailAddresses = alertToEmailAddressesStr.split(",")
+        log.info("alertToEmailAddresses is: " + alertToEmailAddresses)
 
         
 def getHtmlPages():
@@ -632,29 +656,38 @@ def getNewShiftsAvailableForSignup(currShifts):
 
 def sendEmailNotificationMessage(newShiftsAvailableForSignup):
     global adminFromEmailAddress
-    global adminToEmailAddress
+    global alertToEmailAddresses
     fromEmailAddress = adminFromEmailAddress
-    toEmailAddress = adminToEmailAddress
+    toEmailAddresses = alertToEmailAddresses
+    
     emailSubject = "Application '" + APP_NAME + "' new shifts notification"
+    
     endl = "<br />"
     emailBodyHtml = "Hi," + endl + endl + \
         "This is a notification from application '" + \
         APP_NAME + "' that new shifts available for signup.  " + \
         "Below are the new shifts available for signup:  " + endl + endl
 
+    emailBodyHtml += "<table>"
     for shift in newShiftsAvailableForSignup:
-        emailBodyHtml += str(shift) + endl
-        
-    emailBodyHtml += endl + "-" + APP_NAME
+        emailBodyHtml += "  <tr>"
+        emailBodyHtml += "    <td>" + shift.date + "</td>"
+        emailBodyHtml += "    <td>" + shift.location + "</td>"
+        emailBodyHtml += "    <td>" + startTime + " - " + endTime + "</td>"
+        emailBodyHtml += "  </tr>"
+    emailBodyHtml += "</table>"
 
-    log.info("Sending notice email to: " + toEmailAddress)
+    emailBodyHtml += endl + endl
+    emailBodyHtml += "-" + APP_NAME
+
+    log.info("Sending notice email to: " + toEmailAddresses)
         
     client = boto3.client('ses')
     response = client.send_email(
         Destination={
-            'ToAddresses': [toEmailAddress],
+            'ToAddresses': [],
             'CcAddresses': [],
-            'BccAddresses': []
+            'BccAddresses': toEmailAddresses
             },
         Message={
             'Subject': {
@@ -747,6 +780,7 @@ if __name__ == "__main__":
     initializeDatabase()
     initializeTwilio()
     initializeAdminEmailAddresses()
+    initializeAlertEmailAddresses()
     
     while True:
         try:
