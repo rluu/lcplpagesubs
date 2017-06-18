@@ -78,7 +78,8 @@ adminFromEmailAddress = None
 adminToEmailAddress = None
 adminErrorEmailSendingEnabled = True
 
-# These globals are for sending out alert email addresses.
+# This global is for sending out alert email addresses.
+# See the method initializeAlertEmailAddresses() below.
 alertToEmailAddresses = None
 
 ##############################################################################
@@ -266,7 +267,7 @@ def initializeAlertEmailAddresses():
         shutdown(1)
     else:
         alertToEmailAddresses = alertToEmailAddressesStr.split(",")
-        log.info("alertToEmailAddresses is: " + alertToEmailAddresses)
+        log.info("alertToEmailAddresses is: " + str(alertToEmailAddresses))
 
         
 def getHtmlPages():
@@ -680,7 +681,7 @@ def sendEmailNotificationMessage(newShiftsAvailableForSignup):
     emailBodyHtml += endl + endl
     emailBodyHtml += "-" + APP_NAME
 
-    log.info("Sending notice email to: " + toEmailAddresses)
+    log.info("Sending notice email to: " + str(toEmailAddresses))
         
     client = boto3.client('ses')
     response = client.send_email(
