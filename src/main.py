@@ -306,6 +306,8 @@ def getHtmlPages():
         log.info("Fetching webpage from URL: " + url)
         r = requests.get(url)
         log.debug("HTTP status code: " + str(r.status_code))
+        numSeconds = 1
+        time.sleep(numSeconds)
         if 200 <= r.status_code < 300:
             html = r.text
             htmls.append(html)
