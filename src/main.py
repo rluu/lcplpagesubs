@@ -674,7 +674,7 @@ def sendEmailNotificationMessage(newShiftsAvailableForSignup):
         emailBodyHtml += "  <tr>"
         emailBodyHtml += "    <td>" + shift.date + "</td>"
         emailBodyHtml += "    <td>" + shift.location + "</td>"
-        emailBodyHtml += "    <td>" + startTime + " - " + endTime + "</td>"
+        emailBodyHtml += "    <td>" + shift.startTime + " - " + shift.endTime + "</td>"
         emailBodyHtml += "  </tr>"
     emailBodyHtml += "</table>"
 
