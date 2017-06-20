@@ -37,6 +37,7 @@ export TWILIO_SRC_PHONE_NUMBER="+1XXXYYYZZZZ"
 export TWILIO_DEST_PHONE_NUMBER="+1XXXYYYZZZZ"
 
 export LCPL_PAGE_SUBS_ADMIN_EMAIL_ADDRESS="username@example.com"
+export LCPL_PAGE_SUBS_ALERT_EMAIL_ADDRESSES="user1@example.com,user2@example.com"
 
 cd src
 python3 main.py

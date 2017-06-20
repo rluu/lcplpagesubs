@@ -669,16 +669,16 @@ def sendEmailNotificationMessage(newShiftsAvailableForSignup):
         APP_NAME + "' that new shifts available for signup.  " + \
         "Below are the new shifts available for signup:  " + endl + endl
 
-    emailBodyHtml += "<table>"
+    emailBodyHtml += "<table>" + endl
     for shift in newShiftsAvailableForSignup:
-        emailBodyHtml += "  <tr>"
-        emailBodyHtml += "    <td>" + shift.date + "</td>"
-        emailBodyHtml += "    <td>" + shift.location + "</td>"
-        emailBodyHtml += "    <td>" + shift.startTime + " - " + shift.endTime + "</td>"
-        emailBodyHtml += "  </tr>"
-    emailBodyHtml += "</table>"
+        emailBodyHtml += "  <tr>" + endl
+        emailBodyHtml += "    <td>" + shift.date + "</td>" + endl
+        emailBodyHtml += "    <td>" + shift.location + "</td>" + endl
+        emailBodyHtml += "    <td>" + shift.startTime + " - " + shift.endTime + "</td>" + endl
+        emailBodyHtml += "  </tr>" + endl
+    emailBodyHtml += "</table>" + endl
 
-    emailBodyHtml += endl + endl
+    emailBodyHtml += endl
     emailBodyHtml += "-" + APP_NAME
 
     log.info("Sending notice email to: " + str(toEmailAddresses))
