@@ -22,7 +22,7 @@ from bs4 import BeautifulSoup
 ##############################################################################
 
 __version__ = "1.0.0"
-__date__ = "Sat Jun 10 18:44:23 EDT 2017"
+__date__ = "Wed Jun 21 20:13:54 EDT 2017"
 
 
 # Application Name
@@ -710,15 +710,11 @@ def sendEmailNotificationMessage(newShiftsAvailableForSignup):
     log.info("Sending email done.")
     log.info("Response from AWS is: " + str(response))
     
-def sendNotificationMessage(newShiftsAvailableForSignup):
+def sendTextNotificationMessage(newShiftsAvailableForSignup):
     """
     Sends out a text message notifying the user that there are 
     new shifts available for signup.
 
-    # TODO_rluu: Look into SES in AWS.  I am currently in a sandbox with that
-    # feature, with 200 emails sent allowed per 24-hour.  I may need to verify
-    # email addresses that I want to send to.
-    
     # To send a message to a Verizon Wireless phone from a personal computer,
     # enter the person's mobile number followed by @vtext.com in the “to” field
     # of your e-mail message – for example, 5551234567@vtext.com. Type an e-mail
@@ -809,7 +805,7 @@ if __name__ == "__main__":
                      " new shifts available for signup since we last checked.")
             
             if len(newShiftsAvailableForSignup) > 0:
-                sendNotificationMessage(newShiftsAvailableForSignup)
+                sendTextNotificationMessage(newShiftsAvailableForSignup)
                 sendEmailNotificationMessage(newShiftsAvailableForSignup)
                 
             numSeconds = 60

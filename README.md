@@ -7,7 +7,7 @@ Git Repository URL: https://github.com/rluu/lcplpagesubs.git
 
 ## Description:
 
-Monitors the LCPL Page Subs website, sending text message notifications when there are newly available signup slots.
+Monitors the LCPL Page Subs website, sending text message and email notifications when there are newly available signup slots.
 
 ## Installation
 
@@ -48,9 +48,9 @@ python3 main.py
 - python3
 
 The following python3 dependencies are installed via pip from the pip_requirements.txt file:
-- beautifulsoup4
-- twilio
-- requests
+- beautifulsoup4 (For parsing HTML)
+- twilio (For sending SMS text messages)
+- requests (For making HTTP requests)
 - boto3  (AWS SDK library for Python)
 
 
