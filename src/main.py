@@ -372,7 +372,7 @@ def getShiftsFromHtml(html):
         spanText = spans[col].text.upper().strip()
         col += 1
         if isSpanTextADateField(spanText):
-            dateText = spanText[:8]
+            dateText = spanText[:10]
             lastDateText = dateText
         elif isSpanTextALocationField(spanText) or isSpanTextATimeField(spanText):
             if lastDateText is not None:
@@ -492,11 +492,12 @@ def getShiftsFromHtml(html):
 
 def isSpanTextADateField(spanText):
     dateText = spanText
-    if (len(dateText) < 8):
-        log.debug("Date text should not be less than 8 characters: " + dateText)
+    if (len(dateText) < 10):
+        log.debug("Date text should not be less than 10 characters: " + \
+                  dateText)
         return False
     
-    dateText = dateText[:8]
+    dateText = dateText[:10]
     
     if dateText[2] != "/" or \
             dateText[5] != "/" or \
