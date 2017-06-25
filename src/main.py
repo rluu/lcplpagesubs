@@ -808,10 +808,24 @@ if __name__ == "__main__":
             if len(newShiftsAvailableForSignup) > 0:
                 sendTextNotificationMessage(newShiftsAvailableForSignup)
                 sendEmailNotificationMessage(newShiftsAvailableForSignup)
-                
-            numSeconds = 60
-            log.debug("Sleeping for " + str(numSeconds) + " seconds ...")
-            time.sleep(numSeconds)
+            
+            # We have been getting HTTP 504 errors at 4:33 am each morning,
+            # which causes our application to quit due to the conservative 
+            # error-handling code which I have written.
+            #
+            # This code below is to have the script not make any HTTP requests 
+            # to the web server around this time period.
+            #
+            now = datetime.datetime.now()
+            if now.hour == 4 and (30 <= now.minute < 50):
+                numSeconds = 60 * 20
+                log.debug("Sleeping for " + str(numSeconds) + " seconds ...")
+                time.sleep(numSeconds)
+            else:
+                numSeconds = 60
+                log.debug("Sleeping for " + str(numSeconds) + " seconds ...")
+                time.sleep(numSeconds)
+
         except KeyboardInterrupt:
             log.info("Caught KeyboardInterrupt.  Shutting down cleanly ...")
             shutdown(0)
