@@ -108,6 +108,8 @@ def shutdown(rc):
     """
 
     global adminErrorEmailSendingEnabled
+    global adminFromEmailAddress
+    global adminToEmailAddress
     global conn
     if conn is not None:
         conn.close()
@@ -117,8 +119,6 @@ def shutdown(rc):
             adminFromEmailAddress is not None and \
             adminToEmailAddress is not None:
 
-        global adminFromEmailAddress
-        global adminToEmailAddress
         fromEmailAddress = adminFromEmailAddress
         toEmailAddress = adminToEmailAddress
         emailSubject = "Application '" + APP_NAME + "' shutdown notification"
