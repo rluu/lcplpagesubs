@@ -21,8 +21,8 @@ from bs4 import BeautifulSoup
 # Global variables
 ##############################################################################
 
-__version__ = "1.0.0"
-__date__ = "Wed Jun 21 20:13:54 EDT 2017"
+__version__ = "1.1.0"
+__date__ = "Sat Jul  1 16:56:44 EDT 2017"
 
 
 # Application Name
@@ -88,19 +88,13 @@ alertToEmailAddresses = None
 
 class Shift:
     def __init__(self):
-        self.date = None;
-        self.location = None;
-        self.startTime = None;
-        self.endTime = None;
-        self.description = None;
-        self.status = None;
+        self.url = None
+        self.rowNumber = None
+        self.status = None
 
     def __str__(self):
-        rv = "Shift(date=" + self.date + "," + \
-                "location=" + self.location + "," + \
-                "startTime=" + self.startTime + "," + \
-                "endTime=" + self.endTime + "," + \
-                "description=" + self.description + "," + \
+        rv = "Shift(url=" + self.url + "," + \
+                "rowNumber=" + self.rowNumber + "," + \
                 "status=" + self.status + ")"
         return rv
 
@@ -133,7 +127,7 @@ def shutdown(rc):
         emailBodyHtml += "-" + APP_NAME
 
         log.info("Sending notice email to administrator (" + \
-                 toEmailAddress + \
+                 str(toEmailAddress) + \
                  ") regarding error exit (rc == " + str(rc) + ").")
         
         client = boto3.client('ses')
@@ -177,11 +171,8 @@ def initializeDatabase():
     cursor = conn.cursor()
     cursor.execute("create table if not exists shifts " +
         "(crte_utc_dttm text, " +
-        "shift_date text, " +
-        "location text, " +
-        "start_time text, " +
-        "end_time text, " +
-        "description text, " +
+        "url text, " +
+        "row_number text, " +
         "status text)")
     conn.commit()
 
@@ -272,7 +263,10 @@ def initializeAlertEmailAddresses():
         
 def getHtmlPages():
     """
-    Returns a list of str.  Each str contains the contents of a HTML page.
+    Returns a list of tuples.  
+    Each tuple contains the following:
+      - str containing the URL
+      - str containing the contents of a HTML page.
     """
     
     htmls = []
@@ -310,7 +304,8 @@ def getHtmlPages():
         time.sleep(numSeconds)
         if 200 <= r.status_code < 300:
             html = r.text
-            htmls.append(html)
+            tup = (url, html)
+            htmls.append(tup)
         else:
             log.error("Unexpected HTTP status code: " + str(r.status_code))
             log.error("Response text is: " + r.text)
@@ -319,18 +314,24 @@ def getHtmlPages():
     return htmls
 
 
-def getShiftsFromHtml(html):
+def getShiftsFromHtml(htmlTup):
     """
     Reads the input html str, and extracts the shifts.
 
     Arguments:
-    html - str containing HTML text to parse.
+    htmlTup - tuple containing two entries.  
+        First entry is the URL
+        Second entry is the HTML text to parse.
 
     Returns:
     list of Shift objects
     """
     
     shifts = []
+    
+    url = htmlTup[0]
+    html = htmlTup[1]
+    
     soup = BeautifulSoup(html, 'html5lib')
     mainTable = soup.find("table", {"class" : "SUGtableouter"})
     if mainTable == None:
@@ -347,115 +348,29 @@ def getShiftsFromHtml(html):
     lastDateText = None
     lastLocationText = None
     
-    isFirstRow = True
+    currRow = 0
     for tr in mainTableBody.findAll("tr", recursive=False):
-        #htmlLog.debug("A <tr> of mainTableBody is: " + tr.prettify())
+        htmlLog.debug("A <tr> of mainTableBody is: " + tr.prettify())
         log.debug("There are " + str(len(tr.findAll("td"))) + \
                   " <td> inside this <tr>")
         log.debug("There are " + str(len(tr.findAll("span"))) + \
                   " <span> inside this <tr>")
             
-        if isFirstRow:
+        if currRow == 0:
             log.debug("Skipping first row.")
-            isFirstRow = False
+            currRow += 1
             continue
         else:
             log.debug("Not first row.  Parsing...")
-    
-        spans = tr.find_all("span")
-        log.debug("Found " + str(len(spans)) + " spans.")
+            currRow += 1
 
-        col = 0
-        
-        # Date.
-        dateText = None
-        spanText = spans[col].text.upper().strip()
-        col += 1
-        if isSpanTextADateField(spanText):
-            dateText = spanText[:10]
-            lastDateText = dateText
-        elif isSpanTextALocationField(spanText) or isSpanTextATimeField(spanText):
-            if lastDateText is not None:
-                dateText = lastDateText
-                col -= 1
-            else:
-                log.error("Unexpected number of spans when there was no previous date.  Please see the HTML log for the HTML encountered.")
-                htmlLog.error("<tr> contents is: " + tr.prettify())
-                htmlLog.error("HTML text is: " + html)
-                shutdown(1)
-        else:
-            log.error("Unexpected span text: " + spanText)
-            htmlLog.error("<tr> contents is: " + tr.prettify())
-            htmlLog.error("HTML text is: " + html)
-            shutdown(1)
-        log.debug("dateText == " + dateText)
+        trLowered = tr.prettify().lower()
 
-
-        # Location.
-        locationText = None
-        spanText = spans[col].text.upper().strip()
-        col += 1
-        if isSpanTextALocationField(spanText):
-            locationText = spanText.replace("&nbsp;", " ").strip()
-            lastLocationText = locationText
-        elif isSpanTextATimeField(spanText):
-            if lastLocationText is not None:
-                locationText = lastLocationText
-                col -= 1
-            else:
-                log.error("Unexpected number of spans when there was no previous location.  Please see the HTML log for the HTML encountered")
-                htmlLog.error("<tr> contents is: " + tr.prettify())
-                htmlLog.error("HTML text is: " + html)
-                log.error("<tr> contents is: " + tr.prettify())
-                log.error("HTML text is: " + html)
-                shutdown(1)
-        else:
-            log.error("Unexpected span text: " + spanText)
-            htmlLog.error("<tr> contents is: " + tr.prettify())
-            htmlLog.error("HTML text is: " + html)
-            shutdown(1)
-        log.debug("locationText == " + locationText)
-
-
-        # Start Time and End Time.
-        startTimeText = None
-        endTimeText = None
-        spanText = spans[col].text.upper().strip()
-        col += 1
-        if isSpanTextATimeField(spanText):
-            timeText = spanText.replace("&nbsp;", " ").strip()
-            log.debug("timeText == " + timeText)
-            timeTexts = timeText.split(" - ")
-            startTimeText = timeTexts[0].strip()
-            endTimeText = timeTexts[1].strip()
-        else:
-            log.error("Unexpected span text: " + spanText)
-            htmlLog.error("<tr> contents is: " + tr.prettify())
-            htmlLog.error("HTML text is: " + html)
-            shutdown(1)
-        log.debug("startTimeText == " + startTimeText)
-        log.debug("endTimeText == " + endTimeText)
-    
-        # Description.
-        descriptionText = None
-        spanText = spans[col].text.upper().strip()
-        col += 1
-        if isSpanTextADescriptionField(spanText):
-            descriptionText = spanText.replace("&nbsp;", " ").strip()
-        else:
-            log.error("Unexpected span text: " + spanText)
-            htmlLog.error("<tr> contents is: " + tr.prettify())
-            htmlLog.error("HTML text is: " + html)
-            shutdown(1)
-        log.debug("descriptionText == " + descriptionText)
-    
-    
         # Status.
-        statusText = None
-        spanText = spans[col].text.upper().strip()
-        col += 1
-        if isSpanTextAStatusField(spanText):
-            statusText = spanText.replace("&nbsp;", " ").strip()
+        if re.search("already filled", trLowered, re.IGNORECASE):
+            statusText = "ALREADY FILLED"
+        elif re.search("sign up", trLowered, re.IGNORECASE):
+            statusText = "SIGN UP"
         else:
             log.error("Unexpected span text: " + spanText)
             htmlLog.error("<tr> contents is: " + tr.prettify())
@@ -463,23 +378,9 @@ def getShiftsFromHtml(html):
             shutdown(1)
         log.debug("statusText == " + statusText)
 
-        # Do cleanup of the statusText if possible.
-        if re.search("sign up", statusText, re.IGNORECASE):
-            statusText = "SIGN UP"
-            log.debug("Cleaned up the statusText to: " + statusText)
-        elif re.search("already filled", statusText, re.IGNORECASE):
-            statusText = "ALREADY FILLED"
-            log.debug("Cleaned up the statusText to: " + statusText)
-        else:
-            log.debug("No status text cleanup")
-
-            
         shift = Shift()
-        shift.date = dateText
-        shift.location = locationText
-        shift.startTime = startTimeText
-        shift.endTime = endTimeText
-        shift.description = descriptionText
+        shift.url = url
+        shift.rowNumber = currRow
         shift.status = statusText
     
         shifts.append(shift)
@@ -488,87 +389,6 @@ def getShiftsFromHtml(html):
 
     log.debug("Found " + str(len(shifts)) + " total shifts.")
     return shifts
-
-
-def isSpanTextADateField(spanText):
-    dateText = spanText
-    if (len(dateText) < 10):
-        log.debug("Date text should not be less than 10 characters: " + \
-                  dateText)
-        return False
-    
-    dateText = dateText[:10]
-    
-    if dateText[2] != "/" or \
-            dateText[5] != "/" or \
-            (not dateText[:2].isdigit()) or \
-            (not dateText[3:5].isdigit()) or \
-            (not dateText[6:].isdigit()):
-        
-        log.debug("Date text should be in MM/dd/yyyy.  Date text is: " + \
-                  dateText)
-        return False
-
-    return True
-
-def isSpanTextALocationField(spanText):
-    locationText = spanText.replace("&nbsp;", " ").strip()
-    if bool(re.search(r'\d', locationText)):
-        log.debug("Location text is not expected to have numbers: " + \
-                  locationText)
-        return False
-    elif locationText.find("-") != -1:
-        log.debug("Location text is not expected to have hyphens: " + \
-                  locationText)
-        return False
-    else:
-        return True
-
-def isSpanTextATimeField(spanText):
-    timeText = spanText.replace("&nbsp;", " ").strip()
-    if timeText.find("-") == -1:
-        log.debug("Expected to find a hyphen in the time text: " + \
-                  timeText)
-        return False
-        
-    timeTexts = timeText.split(" - ")
-    if len(timeTexts) != 2:
-        log.debug("Expected to split to 2 str objects: " + \
-                  timeText)
-        return False
-        
-    startTimeText = timeTexts[0].strip()
-    if startTimeText.find(":") == -1:
-        log.debug("Expected to find a : in the startTimeText: " + \
-                  startTimeText)
-        return False
-    
-    endTimeText = timeTexts[1].strip()
-    if endTimeText.find(":") == -1:
-        log.debug("Expected to find a : in the endTimeText: " + \
-                  endTimeText)
-        return False
-
-    return True
-
-def isSpanTextADescriptionField(spanText):
-    descriptionText = spanText.replace("&nbsp;", " ").strip()
-    if bool(re.search(r'\d', descriptionText)):
-        log.debug("Description text is not expected to have numbers: " + \
-                  descriptionText)
-        return False
-    elif descriptionText.find("-") != -1:
-        log.debug("Description text is not expected to have hyphens: " + \
-                  descriptionText)
-        return False
-    else:
-        if descriptionText not in ("MORNING", "AFTERNOON", "EVENING"):
-            log.warn("Unusual descriptionText encountered: " + descriptionText)
-        return True
-
-    
-def isSpanTextAStatusField(spanText):
-    return True
 
 
 def getNewShiftsAvailableForSignup(currShifts):
@@ -589,18 +409,12 @@ def getNewShiftsAvailableForSignup(currShifts):
     
     for shift in currShifts:
         
-        values = (shift.date, 
-                shift.location,
-                shift.startTime,
-                shift.endTime,
-                shift.description)
-            
+        values = (shift.url, 
+                  shift.rowNumber)
+        
         cursor.execute("select * from shifts where " + \
-                "shift_date = ? " + \
-                "and location = ? " + \
-                "and start_time = ? " + \
-                "and end_time = ? " + \
-                "and description = ? " + \
+                "url = ? " + \
+                "and row_number = ? " + \
                 "order by crte_utc_dttm desc limit 1",
                 values)
 
@@ -614,13 +428,10 @@ def getNewShiftsAvailableForSignup(currShifts):
 
             crteUtcDttm = datetime.datetime.utcnow().isoformat()
             values = (crteUtcDttm,
-                    shift.date,
-                    shift.location,
-                    shift.startTime,
-                    shift.endTime,
-                    shift.description,
+                    shift.url,
+                    shift.rowNumber,
                     shift.status)
-            cursor.execute("insert into shifts values (?, ?, ?, ?, ?, ?, ?)",
+            cursor.execute("insert into shifts values (?, ?, ?, ?)",
                            values)
             conn.commit()
     
@@ -628,26 +439,22 @@ def getNewShiftsAvailableForSignup(currShifts):
             # Status was stored previously for this shift.
             # Compare status.
             tup = tups[0]
-            statusColumn = 6
+            statusColumn = 3
             oldStatus = tup[statusColumn]
             if shift.status != oldStatus:
                 log.info("Status changed from " + oldStatus + \
                          " to " + shift.status + " for: " + \
                          str(shift))
-                if re.search("sign up", shift.status, re.IGNORECASE) or \
-                    re.search("signup", shift.status, re.IGNORECASE):
-                    
+                         
+                if re.search("sign up", shift.status, re.IGNORECASE):
                     newShiftsAvailableForSignup.append(shift)
 
                 crteUtcDttm = datetime.datetime.utcnow().isoformat()
                 values = (crteUtcDttm,
-                        shift.date,
-                        shift.location,
-                        shift.startTime,
-                        shift.endTime,
-                        shift.description,
+                        shift.url,
+                        shift.rowNumber,
                         shift.status)
-                cursor.execute("insert into shifts values (?, ?, ?, ?, ?, ?, ?)",
+                cursor.execute("insert into shifts values (?, ?, ?, ?)",
                                values)
                 conn.commit()
         else:
@@ -669,15 +476,28 @@ def sendEmailNotificationMessage(newShiftsAvailableForSignup):
     endl = "<br />"
     emailBodyHtml = "Hi," + endl + endl + \
         "This is a notification from application '" + \
-        APP_NAME + "' that new shifts available for signup.  " + \
-        "Below are the new shifts available for signup:  " + endl + endl
+        APP_NAME + "' that there "
+    if len(newShiftsAvailableForSignup) == 1:
+        emailBodyHtml += "is " + str(len(newShiftsAvailableForSignup)) + \
+            " new shift available for signup.  "
+    else:
+        emailBodyHtml += "are " + str(len(newShiftsAvailableForSignup)) + \
+            " new shifts available for signup.  "
+    emailBodyHtml += "Please visit the below URLs to see them:  " + endl + endl
 
-    emailBodyHtml += "<table>" + endl
+    # Extract unique URLs in a sorted list.
+    urls = []
     for shift in newShiftsAvailableForSignup:
+        if shift.url not in urls:
+            urls.append(shift.url)
+    urls.sort()
+    
+    emailBodyHtml += "<table>" + endl
+    for url in urls:
         emailBodyHtml += "  <tr>" + endl
-        emailBodyHtml += "    <td>" + shift.date + "</td>" + endl
-        emailBodyHtml += "    <td>" + shift.location + "</td>" + endl
-        emailBodyHtml += "    <td>" + shift.startTime + " - " + shift.endTime + "</td>" + endl
+        emailBodyHtml += "    <td>" + endl
+        emailBodyHtml += "      <a href='" + url + "'>" + url + "</a>" + endl
+        emailBodyHtml += "    </td>" + endl
         emailBodyHtml += "  </tr>" + endl
     emailBodyHtml += "</table>" + endl
 
@@ -727,27 +547,10 @@ def sendTextNotificationMessage(newShiftsAvailableForSignup):
     msg = endl + "LCPL Page Shift Update: " + endl
     if len(newShiftsAvailableForSignup) == 1:
         msg += "There is " + str(len(newShiftsAvailableForSignup)) + \
-            " new shift available for signup at: " + endl
+            " new shift available for signup." + endl
     else:
         msg += "There are " + str(len(newShiftsAvailableForSignup)) + \
-            " new shifts available for signup at: " + endl
-    
-    # Extract unique locations.
-    locations = []
-    for shift in newShiftsAvailableForSignup:
-        if shift.location not in locations:
-            locations.append(shift.location)
-    locations.sort()
-
-    # Append locations to the msg string.
-    isFirstLocation = True
-    for location in locations:
-        if isFirstLocation:
-            msg += location
-            isFirstLocation = False
-        else:
-            msg += ", " + location
-    msg += "."
+            " new shifts available for signup." + endl
     
     # Send text message via Twilio.
     global twilioAccountSid
@@ -793,9 +596,10 @@ if __name__ == "__main__":
 
             for i in range(len(htmlPages)):
                 htmlPage = htmlPages[i]
+                url = htmlPage[0]
                 
                 log.info("Getting shifts from HTML page (i == " + \
-                         str(i) + ") ...")
+                         str(i) + ") (url == " + url + ")...")
                          
                 shifts = getShiftsFromHtml(htmlPage)
             
