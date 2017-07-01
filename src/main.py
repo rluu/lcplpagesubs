@@ -289,11 +289,12 @@ def getHtmlPages():
     
     urls = [
         #"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page5",
-        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page6",
+        #"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page6",
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page7",
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page8",
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page11",
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page12",
+	"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page13",
         ]
 
     for url in urls:
