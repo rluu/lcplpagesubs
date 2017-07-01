@@ -16,7 +16,7 @@ import time
 import boto3
 from twilio.rest import Client
 from bs4 import BeautifulSoup
- 
+
 ##############################################################################
 # Global variables
 ##############################################################################
@@ -109,9 +109,14 @@ def shutdown(rc):
 
     global adminErrorEmailSendingEnabled
     global conn
-    conn.close()
+    if conn is not None:
+        conn.close()
 
-    if rc != 0 and adminErrorEmailSendingEnabled == True:
+    if rc != 0 and \
+            adminErrorEmailSendingEnabled == True and \
+            adminFromEmailAddress is not None and \
+            adminToEmailAddress is not None:
+
         global adminFromEmailAddress
         global adminToEmailAddress
         fromEmailAddress = adminFromEmailAddress
@@ -581,10 +586,10 @@ if __name__ == "__main__":
              " (" + sys.argv[0] + "), version " + APP_VERSION)
     log.info("##########################################################")
 
-    initializeDatabase()
-    initializeTwilio()
     initializeAdminEmailAddresses()
     initializeAlertEmailAddresses()
+    initializeDatabase()
+    initializeTwilio()
     
     while True:
         try:
