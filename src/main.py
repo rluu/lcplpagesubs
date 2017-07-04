@@ -93,9 +93,9 @@ class Shift:
         self.status = None
 
     def __str__(self):
-        rv = "Shift(url=" + self.url + "," + \
-                "rowNumber=" + self.rowNumber + "," + \
-                "status=" + self.status + ")"
+        rv = "Shift(url=" + str(self.url) + "," + \
+                "rowNumber=" + str(self.rowNumber) + "," + \
+                "status=" + str(self.status) + ")"
         return rv
 
 ##############################################################################
@@ -628,8 +628,8 @@ if __name__ == "__main__":
             # to the web server around this time period.
             #
             now = datetime.datetime.now()
-            if now.hour == 4 and (25 < now.minute < 50):
-                numSeconds = 60 * 25
+            if now.hour == 4 and now.minute > 25:
+                numSeconds = 60 * 70
                 log.debug("Sleeping for " + str(numSeconds) + " seconds ...")
                 time.sleep(numSeconds)
             else:
