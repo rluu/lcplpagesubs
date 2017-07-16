@@ -123,12 +123,10 @@ def lcplpagesubs_status():
                     firstDashPos = line.find(" - ")
                     if firstDashPos != -1:
                         startupDttm = line[:firstDashPos].strip()
-                        startupDttm = startupDttm.replace(",", ".")
                 elif line.find("Shutdown") != -1 and line.find("rc=") != -1:
                     firstDashPos = line.find(" - ")
                     if firstDashPos != -1:
                         shutdownDttm = line[:firstDashPos].strip()
-                        shutdownDttm = shutdownDttm.replace(",", ".")
 
     startupStatusMessage = ""
     if startupDttm is None:
