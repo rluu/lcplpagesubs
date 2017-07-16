@@ -48,7 +48,7 @@ To run the serverstatus HTTP server:
 cd lcplpagesubs
 source venv/bin/activate
 
-python3 src/serverstatus.py
+python3 src/serverstatus.py --host="0.0.0.0" --port="5000"
 ```
 
 
