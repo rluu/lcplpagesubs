@@ -112,7 +112,7 @@ def lcplpagesubs_status():
 
     psInfoLines = []
     for line in sh.grep(sh.ps('-ef', _piped=True), "--color=none", "python3"):
-        if line.find("grep python3") == -1:
+        if line.find("grep --color=none") == -1:
             psInfoLines.append(html.escape(line.strip()))
 
     tailLines = []
