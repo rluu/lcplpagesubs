@@ -144,7 +144,6 @@ def sendAdminNotificationEmail(emailSubject = "", emailBodyHtml = ""):
         
         log.info("Sending email done.")
         log.info("Response from AWS is: " + str(response))
-        log.info("Now exiting ...")
         
 def shutdown(rc):
     """
@@ -171,6 +170,7 @@ def shutdown(rc):
 
         sendAdminNotificationEmail(emailSubject, emailBodyHtml)
         
+    log.info("Shutdown (rc=" + rc + ").")
     logging.shutdown()
     sys.exit(rc)
 
