@@ -170,7 +170,7 @@ def shutdown(rc):
 
         sendAdminNotificationEmail(emailSubject, emailBodyHtml)
         
-    log.info("Shutdown (rc=" + rc + ").")
+    log.info("Shutdown (rc=" + str(rc) + ").")
     logging.shutdown()
     sys.exit(rc)
 
