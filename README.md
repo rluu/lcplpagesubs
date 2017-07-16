@@ -40,8 +40,19 @@ export LCPL_PAGE_SUBS_ADMIN_EMAIL_ADDRESS="username@example.com"
 export LCPL_PAGE_SUBS_ALERT_EMAIL_ADDRESSES="user1@example.com,user2@example.com"
 
 cd src
-python3 main.py
+python3 lcplpagesubs.py
 ```
+
+To run the serverstatus HTTP server:
+
+```bash
+cd lcplpagesubs
+source venv/bin/activate
+
+cd src
+python3 serverstatus.py
+```
+
 
 ## Dependencies
 
@@ -51,6 +62,8 @@ The following python3 dependencies are installed via pip from the pip_requiremen
 - beautifulsoup4 (For parsing HTML)
 - twilio (For sending SMS text messages)
 - requests (For making HTTP requests)
-- boto3  (AWS SDK library for Python)
+- boto3 (AWS SDK library for Python)
+- sh (For running shell commands)
+- Flask (For running a HTTP status server)
 
 
