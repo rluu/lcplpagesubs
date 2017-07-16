@@ -39,8 +39,7 @@ export TWILIO_DEST_PHONE_NUMBER="+1XXXYYYZZZZ"
 export LCPL_PAGE_SUBS_ADMIN_EMAIL_ADDRESS="username@example.com"
 export LCPL_PAGE_SUBS_ALERT_EMAIL_ADDRESSES="user1@example.com,user2@example.com"
 
-cd src
-python3 lcplpagesubs.py
+python3 src/lcplpagesubs.py
 ```
 
 To run the serverstatus HTTP server:
@@ -49,8 +48,7 @@ To run the serverstatus HTTP server:
 cd lcplpagesubs
 source venv/bin/activate
 
-cd src
-python3 serverstatus.py
+python3 src/serverstatus.py
 ```
 
 
