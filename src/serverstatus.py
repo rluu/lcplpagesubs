@@ -25,13 +25,28 @@ def tail(filename, n):
     lines = subprocess.check_output(cmd).decode("UTF-8").split("\n")
     return lines
 
+def toHtmlNbspAndHtmlHyphen(strWithSpacesOrDashes):
+    """Returns the string with spaces replaced with HTML non-breaking spaces,
+    and the hyphens replaced with HTML non-breaking hyphens.
+    """
+    rv = strWithSpacesOrDashes
+    rv = rv.replace(" ", "&nbsp;")
+    rv = rv.replace("-", "&#8209;")
+    return rv
+
 def getHtmlHead():
     htmlStr = "<head>"
     htmlStr += "  <style>"
+
     htmlStr += "    body {"
     htmlStr += "      font-family: Courier New;"
     htmlStr += "      font-size: small;"
     htmlStr += "    }"
+
+    htmlStr += "    h1, h2, h3, h4, h5, h6 {"
+    htmlStr += "      font-family: Arial;"
+    htmlStr += "    }"
+
     htmlStr += "  </style>"
     htmlStr += "</head>"
     return htmlStr
@@ -44,16 +59,31 @@ def index():
 def serverstatus():
     endl = "<br />"
     htmlStr = "<html>"
-    htmlStr += getHtmlHead()
+
+    htmlStr = "<head>"
+    htmlStr += "  <style>"
+    htmlStr += "    body {"
+    htmlStr += "      font-family: Arial;"
+    htmlStr += "      font-size: large;"
+    htmlStr += "    }"
+    htmlStr += "  </style>"
+    htmlStr += "</head>"
+
     htmlStr += "<body>"
-    htmlStr += "<p>Welcome to my server status page!</p>"
+
+    htmlStr += "<hr />"
+    htmlStr += "<h3>Welcome to my server status page!</h3>"
+    htmlStr += "<hr />"
+
     htmlStr += endl
     htmlStr += endl
 
     url = url_for("lcplpagesubs_status") 
     htmlStr += "<a href=" + url + ">" + url + "</a>" + endl
+    htmlStr += endl
 
     htmlStr += "</body>"
+
     htmlStr += "</html>"
 
     return htmlStr
@@ -93,10 +123,12 @@ def lcplpagesubs_status():
                     firstDashPos = line.find(" - ")
                     if firstDashPos != -1:
                         startupDttm = line[:firstDashPos].strip()
+                        startupDttm = startupDttm.replace(",", ".")
                 elif line.find("Shutdown") != -1 and line.find("rc=") != -1:
                     firstDashPos = line.find(" - ")
                     if firstDashPos != -1:
                         shutdownDttm = line[:firstDashPos].strip()
+                        shutdownDttm = shutdownDttm.replace(",", ".")
 
     startupStatusMessage = ""
     if startupDttm is None:
@@ -113,7 +145,20 @@ def lcplpagesubs_status():
     psInfoLines = []
     for line in sh.grep(sh.ps('-ef', _piped=True), "--color=none", "python3"):
         if line.find("grep --color=none") == -1:
-            psInfoLines.append(html.escape(line.strip()))
+            username = ""
+
+            splitLine = line.split(" ")
+            if len(splitLine) > 0:
+                username = splitLine[0]
+
+            usernameReplacement = ""
+            for i in range(len(username)):
+                usernameReplacement += "&nbsp;"
+
+            escapedLine = html.escape(line[len(username):])
+            psInfoLine = usernameReplacement + \
+                toHtmlNbspAndHtmlHyphen(escapedLine)
+            psInfoLines.append(psInfoLine)
 
     tailLines = []
     if os.path.isfile(lcplpagesubsLogFilename):
@@ -122,16 +167,19 @@ def lcplpagesubs_status():
         for i in range(len(lines)):
             line = lines[i]
             escapedLine = html.escape(line)
-            tailLines.append(escapedLine)
+            tailLine = toHtmlNbspAndHtmlHyphen(escapedLine)
+            tailLines.append(tailLine)
 
-    line1 = "{:<24s}".format("Current status as of: ") + str(nowLocal)
-    line1 = line1.replace(" ", "&nbsp;")
+    fixedWidthSize = 23
+    desiredFormat = "{:<" + str(fixedWidthSize) + "s}"
+    line1 = desiredFormat.format("Current status as of: ") + str(nowLocal)
+    line1 = toHtmlNbspAndHtmlHyphen(line1)
 
-    line2 = "{:<24s}".format("Last startup was: ") + startupStatusMessage
-    line2 = line2.replace(" ", "&nbsp;")
+    line2 = desiredFormat.format("Last startup was: ") + startupStatusMessage
+    line2 = toHtmlNbspAndHtmlHyphen(line2)
 
-    line3 = "{:<24s}".format("Last shutdown was: ") + shutdownStatusMessage
-    line3 = line3.replace(" ", "&nbsp;") 
+    line3 = desiredFormat.format("Last shutdown was: ") + shutdownStatusMessage
+    line3 = toHtmlNbspAndHtmlHyphen(line3)
 
     htmlStr = "<html>"
     htmlStr += getHtmlHead()
@@ -150,7 +198,7 @@ def lcplpagesubs_status():
     htmlStr += endl
     htmlStr += "Running python3 processes are: " + endl
     for line in psInfoLines:
-        htmlStr += indent + line + endl
+        htmlStr += line + endl
     htmlStr += endl
     htmlStr += "<hr />"
     htmlStr += endl

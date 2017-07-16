@@ -48,7 +48,12 @@ To run the serverstatus HTTP server:
 cd lcplpagesubs
 source venv/bin/activate
 
-python3 src/serverstatus.py --host="0.0.0.0" --port="5000"
+# Development environment:
+python3 src/serverstatus.py --host="0.0.0.0" --port="5000" --debug
+
+# Production environment:
+cd src
+gunicorn -b 0.0.0.0:5000 wsgi 2>&1 | tee -a ../logs/lcplpagesubsr.serverstatus.log
 ```
 
 

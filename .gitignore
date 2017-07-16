@@ -1,6 +1,9 @@
 venv
 src/__pycache__
+
 logs/lcplpagesubs.log*
 logs/lcplpagesubs.html.log*
+logs/lcplpagesubs.serverstatus.log
+
 data/lcpl_page_shifts.db
 
