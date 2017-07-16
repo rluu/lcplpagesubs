@@ -170,9 +170,9 @@ def lcplpagesubs_status():
             tailLine = toHtmlNbspAndHtmlHyphen(escapedLine)
             tailLines.append(tailLine)
 
-    fixedWidthSize = 23
+    fixedWidthSize = 22
     desiredFormat = "{:<" + str(fixedWidthSize) + "s}"
-    line1 = desiredFormat.format("Current status as of: ") + str(nowLocal)
+    line1 = desiredFormat.format("Current server time: ") + str(nowLocal)
     line1 = toHtmlNbspAndHtmlHyphen(line1)
 
     line2 = desiredFormat.format("Last startup was: ") + startupStatusMessage
