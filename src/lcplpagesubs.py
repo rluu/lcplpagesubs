@@ -23,7 +23,7 @@ from bs4 import BeautifulSoup
 # Global variables
 ##############################################################################
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __date__ = "Sat Jul  1 16:56:44 EDT 2017"
 
 
@@ -118,7 +118,9 @@ def sendAdminNotificationEmail(emailSubject = "", emailBodyHtml = ""):
         
         log.info("Sending notice email to administrator (" + \
                  str(toEmailAddress) + \
-                 ") regarding error exit (rc == " + str(rc) + ").")
+                 ").")
+        log.debug("emailSubject: " + emailSubject + \
+                ", emailBodyHtml: " + emailBodyHtml)
         
         client = boto3.client('ses')
         response = client.send_email(
@@ -312,24 +314,61 @@ def getHtmlPages():
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page8",
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page11",
         "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page12",
-	"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page13",
+        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page13",
         ]
 
     for url in urls:
-        try:
-            log.info("Fetching webpage from URL: " + url)
-            r = requests.get(url)
-            log.debug("HTTP status code: " + str(r.status_code))
-            numSeconds = 2
-            time.sleep(numSeconds)
-            if 200 <= r.status_code < 300:
-                html = r.text
-                tup = (url, html)
-                htmls.append(tup)
-            else:
+        shouldTryAgain = True
+        while shouldTryAgain:
+            shouldTryAgain = False
+            try:
+                log.info("Fetching webpage from URL: " + url)
+                r = requests.get(url)
+                log.debug("HTTP status code: " + str(r.status_code))
+                numSeconds = 2
+                time.sleep(numSeconds)
+                if 200 <= r.status_code < 300:
+                    html = r.text
+                    tup = (url, html)
+                    htmls.append(tup)
+                elif r.status_code in [500, 502, 503, 504]:
+                    log.warn("URL: " + url)
+                    log.warn("Unexpected HTTP status code: " + str(r.status_code))
+                    log.warn("Response text is: " + str(r.text))
+    
+                    shouldTryAgain = True
+                    numSeconds = 60
+                    log.info("Retry in " + str(numSeconds) + " seconds ...")
+                    time.sleep(numSeconds)
+                else:
+                    log.error("URL: " + url)
+                    log.error("Unexpected HTTP status code: " + str(r.status_code))
+                    log.error("Response text is: " + str(r.text))
+                    
+                    emailSubject = \
+                        "Admin Notification for Application '" + APP_NAME + "' "
+                    endl = "<br />"
+                    emailBodyHtml = "Hi," + endl + endl + \
+                        "This is a notification to the site Admin that " + \
+                        "application '" + APP_NAME + \
+                        "' encountered an unexpected HTTP status code.  " + \
+                        "Please investigate at your earliest convenience.  " + \
+                        "Thank you." + \
+                        endl + endl + \
+                        "URL was: " + url + \
+                        endl + endl + \
+                        "Unexpected HTTP status code: " + str(r.status_code) + \
+                        endl + endl + \
+                        "Response text was: " + str(r.text) + \
+                        endl + endl + \
+                        "-" + APP_NAME
+                    
+                    sendAdminNotificationEmail(emailSubject, emailBodyHtml)
+                    shutdown(1)
+                    
+            except RequestException as e:
                 log.error("URL: " + url)
-                log.error("Unexpected HTTP status code: " + str(r.status_code))
-                log.error("Response text is: " + str(r.text))
+                log.error("Caught RequestException: " + str(e))
                 
                 emailSubject = \
                     "Admin Notification for Application '" + APP_NAME + "' "
@@ -337,43 +376,18 @@ def getHtmlPages():
                 emailBodyHtml = "Hi," + endl + endl + \
                     "This is a notification to the site Admin that " + \
                     "application '" + APP_NAME + \
-                    "' encountered an unexpected HTTP status code.  " + \
+                    "' encountered an unexpected RequestException.  " + \
                     "Please investigate at your earliest convenience.  " + \
                     "Thank you." + \
                     endl + endl + \
                     "URL was: " + url + \
                     endl + endl + \
-                    "Unexpected HTTP status code: " + str(r.status_code) + \
-                    endl + endl + \
-                    "Response text was: " + str(r.text) + \
+                    "RequestException was: " + str(e) + \
                     endl + endl + \
                     "-" + APP_NAME
-                
+                    
                 sendAdminNotificationEmail(emailSubject, emailBodyHtml)
                 shutdown(1)
-                
-        except RequestException as e:
-            log.error("URL: " + url)
-            log.error("Caught RequestException: " + str(e))
-            
-            emailSubject = \
-                "Admin Notification for Application '" + APP_NAME + "' "
-            endl = "<br />"
-            emailBodyHtml = "Hi," + endl + endl + \
-                "This is a notification to the site Admin that " + \
-                "application '" + APP_NAME + \
-                "' encountered an unexpected RequestException.  " + \
-                "Please investigate at your earliest convenience.  " + \
-                "Thank you." + \
-                endl + endl + \
-                "URL was: " + url + \
-                endl + endl + \
-                "RequestException was: " + str(e) + \
-                endl + endl + \
-                "-" + APP_NAME
-                
-            sendAdminNotificationEmail(emailSubject, emailBodyHtml)
-            shutdown(1)
 
     return htmls
 

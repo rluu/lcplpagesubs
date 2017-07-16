@@ -61,7 +61,9 @@ The following python3 dependencies are installed via pip from the pip_requiremen
 - twilio (For sending SMS text messages)
 - requests (For making HTTP requests)
 - boto3 (AWS SDK library for Python)
-- sh (For running shell commands)
+
 - Flask (For running a HTTP status server)
+- gunicorn (For running a HTTP status server)
+- sh (For running shell commands in the status server)
 
 
