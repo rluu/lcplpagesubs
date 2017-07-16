@@ -39,6 +39,7 @@ export TWILIO_DEST_PHONE_NUMBER="+1XXXYYYZZZZ"
 export LCPL_PAGE_SUBS_ADMIN_EMAIL_ADDRESS="username@example.com"
 export LCPL_PAGE_SUBS_ALERT_EMAIL_ADDRESSES="user1@example.com,user2@example.com"
 
+# Development and Production environments (can be started from any path):
 python3 src/lcplpagesubs.py
 ```
 
@@ -48,12 +49,12 @@ To run the serverstatus HTTP server:
 cd lcplpagesubs
 source venv/bin/activate
 
-# Development environment:
+# Development environment (can be started from any path):
 python3 src/serverstatus.py --host=0.0.0.0 --port=5000 --debug
 
-# Production environment:
+# Production environment (must be started from src directory):
 cd src
-gunicorn --workers=2 --bind=0.0.0.0:5000 wsgi 2>&1 | tee -a ../logs/lcplpagesubs.serverstatus.log
+gunicorn --workers=2 --bind=0.0.0.0:5000 --log-config=../conf/logging.conf wsgi
 ```
 
 
