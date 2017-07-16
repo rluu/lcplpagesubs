@@ -102,35 +102,18 @@ class Shift:
 # Methods
 ##############################################################################
 
-def shutdown(rc):
-    """
-    Exits the script, but first flushes all logging handles, etc.
-    """
-
+def sendAdminNotificationEmail(emailSubject = "", emailBodyHtml = ""):
     global adminErrorEmailSendingEnabled
     global adminFromEmailAddress
     global adminToEmailAddress
-    global conn
-    if conn is not None:
-        conn.close()
-
-    if rc != 0 and \
-            adminErrorEmailSendingEnabled == True and \
+    
+    if adminErrorEmailSendingEnabled == True and \
             adminFromEmailAddress is not None and \
             adminToEmailAddress is not None:
 
         fromEmailAddress = adminFromEmailAddress
         toEmailAddress = adminToEmailAddress
-        emailSubject = "Application '" + APP_NAME + "' shutdown notification"
-        endl = "<br />"
-        emailBodyHtml = "Hi," + endl + endl + \
-            "This is a notification to the site Admin that application '" + \
-            APP_NAME + "' has quit unexpectedly with non-zero return code: " + \
-            str(rc) + ".  " + \
-            "Please investigate at your earliest convenience.  Thank you." + \
-            endl + endl
-        emailBodyHtml += "-" + APP_NAME
-
+        
         log.info("Sending notice email to administrator (" + \
                  str(toEmailAddress) + \
                  ") regarding error exit (rc == " + str(rc) + ").")
@@ -160,6 +143,32 @@ def shutdown(rc):
         log.info("Sending email done.")
         log.info("Response from AWS is: " + str(response))
         log.info("Now exiting ...")
+        
+def shutdown(rc):
+    """
+    Exits the script, but first flushes all logging handles, etc.
+    """
+
+    global adminErrorEmailSendingEnabled
+    global conn
+
+    if conn is not None:
+        conn.close()
+
+    if rc != 0 and adminErrorEmailSendingEnabled == True:
+        emailSubject = \
+            "Shutdown Notification for Application '" + APP_NAME + "' "
+        endl = "<br />"
+        emailBodyHtml = "Hi," + endl + endl + \
+            "This is a notification to the site Admin that application '" + \
+            APP_NAME + "' has quit unexpectedly with non-zero return code: " + \
+            str(rc) + ".  " + \
+            "Please investigate at your earliest convenience.  Thank you." + \
+            endl + endl
+        emailBodyHtml += "-" + APP_NAME
+
+        sendAdminNotificationEmail(emailSubject, emailBodyHtml)
+        
     logging.shutdown()
     sys.exit(rc)
 
@@ -303,18 +312,63 @@ def getHtmlPages():
         ]
 
     for url in urls:
-        log.info("Fetching webpage from URL: " + url)
-        r = requests.get(url)
-        log.debug("HTTP status code: " + str(r.status_code))
-        numSeconds = 2
-        time.sleep(numSeconds)
-        if 200 <= r.status_code < 300:
-            html = r.text
-            tup = (url, html)
-            htmls.append(tup)
-        else:
-            log.error("Unexpected HTTP status code: " + str(r.status_code))
-            log.error("Response text is: " + r.text)
+        try:
+            log.info("Fetching webpage from URL: " + url)
+            r = requests.get(url)
+            log.debug("HTTP status code: " + str(r.status_code))
+            numSeconds = 2
+            time.sleep(numSeconds)
+            if 200 <= r.status_code < 300:
+                html = r.text
+                tup = (url, html)
+                htmls.append(tup)
+            else:
+                log.error("URL: " + url)
+                log.error("Unexpected HTTP status code: " + str(r.status_code))
+                log.error("Response text is: " + str(r.text))
+                
+                emailSubject = \
+                    "Admin Notification for Application '" + APP_NAME + "' "
+                endl = "<br />"
+                emailBodyHtml = "Hi," + endl + endl + \
+                    "This is a notification to the site Admin that " + \
+                    "application '" + APP_NAME + \
+                    "' encountered an unexpected HTTP status code.  " + \
+                    "Please investigate at your earliest convenience.  " + \
+                    "Thank you." + \
+                    endl + endl + \
+                    "URL was: " + url + \
+                    endl + endl + \
+                    "Unexpected HTTP status code: " + str(r.status_code) + \
+                    endl + endl + \
+                    "Response text was: " + str(r.text) + \
+                    endl + endl + \
+                    "-" + APP_NAME
+                
+                sendAdminNotificationEmail(emailSubject, emailBodyHtml)
+                shutdown(1)
+                
+        except RequestException as e:
+            log.error("URL: " + url)
+            log.error("Caught RequestException: " + str(e))
+            
+            emailSubject = \
+                "Admin Notification for Application '" + APP_NAME + "' "
+            endl = "<br />"
+            emailBodyHtml = "Hi," + endl + endl + \
+                "This is a notification to the site Admin that " + \
+                "application '" + APP_NAME + \
+                "' encountered an unexpected RequestException.  " + \
+                "Please investigate at your earliest convenience.  " + \
+                "Thank you." + \
+                endl + endl + \
+                "URL was: " + url + \
+                endl + endl + \
+                "RequestException was: " + str(e) + \
+                endl + endl + \
+                "-" + APP_NAME
+                
+            sendAdminNotificationEmail(emailSubject, emailBodyHtml)
             shutdown(1)
 
     return htmls
@@ -489,7 +543,7 @@ def sendEmailNotificationMessage(newShiftsAvailableForSignup):
     else:
         emailBodyHtml += "are " + str(len(newShiftsAvailableForSignup)) + \
             " new shifts available for signup.  "
-    emailBodyHtml += "Please visit the below URLs to see them:  " + endl + endl
+    emailBodyHtml += "Please visit the below URL(s) to see them:" + endl + endl
 
     # Extract unique URLs in a sorted list.
     urls = []
