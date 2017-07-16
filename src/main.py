@@ -12,6 +12,8 @@ import logging.config
 import re
 import sqlite3
 import requests
+from requests.exceptions import RequestException
+from requests.exceptions import ConnectionError
 import time
 import boto3
 from twilio.rest import Client
