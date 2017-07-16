@@ -154,9 +154,9 @@ def shutdown(rc):
     global conn
 
     if conn is not None:
-        logger.info("Closing database connection ...")
+        log.info("Closing database connection ...")
         conn.close()
-        logger.info("Done closing database connection.")
+        log.info("Done closing database connection.")
 
     if rc != 0 and adminErrorEmailSendingEnabled == True:
         emailSubject = \
