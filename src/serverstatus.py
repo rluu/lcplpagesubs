@@ -28,7 +28,7 @@ def tail(filename, n):
 def getHtmlHead():
     htmlStr = "<head>"
     htmlStr += "  <style>"
-    htmlStr += "    html {"
+    htmlStr += "    body {"
     htmlStr += "      font-family: Courier New;"
     htmlStr += "      font-size: small;"
     htmlStr += "    }"
@@ -124,26 +124,27 @@ def lcplpagesubs_status():
             escapedLine = html.escape(line)
             tailLines.append(escapedLine)
 
+    line1 = "{:<24s}".format("Current status as of: ") + str(nowLocal)
+    line1 = line1.replace(" ", "&nbsp;")
+
+    line2 = "{:<24s}".format("Last startup was: ") + startupStatusMessage
+    line2 = line2.replace(" ", "&nbsp;")
+
+    line3 = "{:<24s}".format("Last shutdown was: ") + shutdownStatusMessage
+    line3 = line3.replace(" ", "&nbsp;") 
+
     htmlStr = "<html>"
     htmlStr += getHtmlHead()
     htmlStr += "<body>"
     htmlStr += "<hr />"
     htmlStr += "<h3>Application LCPL Page Subs</h3>"
     htmlStr += "<hr />"
-    htmlStr += "<table cellpadding='5'>"
-    htmlStr += "  <tr>"
-    htmlStr += "    <td>Current status as of: </td>"
-    htmlStr += "    <td>" + str(nowLocal) + "</td>"
-    htmlStr += "  </tr>"
-    htmlStr += "  <tr>"
-    htmlStr += "    <td>Last startup was: </td>"
-    htmlStr += "    <td>" + startupStatusMessage + "</td>"
-    htmlStr += "  </tr>"
-    htmlStr += "  <tr>"
-    htmlStr += "    <td>Last shutdown was: </td>"
-    htmlStr += "    <td>" + shutdownStatusMessage + "</td>"
-    htmlStr += "  </tr>"
-    htmlStr += "</table>"
+    htmlStr += endl
+    htmlStr += line1 + endl
+    htmlStr += endl
+    htmlStr += line2 + endl
+    htmlStr += endl
+    htmlStr += line3 + endl
     htmlStr += endl
     htmlStr += "<hr />"
     htmlStr += endl
