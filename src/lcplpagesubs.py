@@ -62,6 +62,10 @@ LOG_CONFIG_FILE = \
                                  "logging.conf"))
 
 # For logging.
+# Logging config file specifies the log filename relative to the current
+# directory, so we need to chdir to the SRC_DIR before loading the logging
+# config.
+os.chdir(SRC_DIR)
 logging.config.fileConfig(LOG_CONFIG_FILE)
 log = logging.getLogger("main")
 htmlLog = logging.getLogger("html")
