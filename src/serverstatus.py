@@ -4,9 +4,17 @@ import html
 import datetime
 import sh
 import subprocess
+import sys
 import os
 import os.path
 from flask import Flask, redirect, url_for
+
+# Location of the source directory, based on this script file.
+SRC_DIR = os.path.abspath(sys.path[0])
+
+LOG_DIR = \
+    os.path.abspath(os.path.join(SRC_DIR,
+                                 ".." + os.sep + "logs"))
 
 global app
 app = Flask(__name__)
@@ -57,8 +65,8 @@ def lcplpagesubs_status():
 
     nowLocal = datetime.datetime.now()
 
-    lcplpagesubsLogsPath = "/media/RyanLuu/programming/lcplpagesubs/logs"
-    lcplpagesubsLogFilename = lcplpagesubsLogsPath + "/" + "lcplpagesubs.log"
+    lcplpagesubsLogsPath = LOG_DIR
+    lcplpagesubsLogFilename = lcplpagesubsLogsPath + os.sep + "lcplpagesubs.log"
 
     startupDttm = None
     shutdownDttm = None
