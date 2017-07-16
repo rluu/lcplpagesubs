@@ -49,11 +49,11 @@ cd lcplpagesubs
 source venv/bin/activate
 
 # Development environment:
-python3 src/serverstatus.py --host="0.0.0.0" --port="5000" --debug
+python3 src/serverstatus.py --host=0.0.0.0 --port=5000 --debug
 
 # Production environment:
 cd src
-gunicorn -b 0.0.0.0:5000 wsgi 2>&1 | tee -a ../logs/lcplpagesubsr.serverstatus.log
+gunicorn --workers=2 --bind=0.0.0.0:5000 wsgi 2>&1 | tee -a ../logs/lcplpagesubs.serverstatus.log
 ```
 
 
