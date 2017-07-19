@@ -374,16 +374,15 @@ def getHtmlPages():
 
     urls = []
     for tup in tups:
-        log.debug("Looking at: " + str(tup))
+        log.debug("Looking at 'urls' row: " + str(tup))
         crteUtcDttm = tup[0]
         updUtcDttm = tup[1]
         url = tup[2]
         activeInd = tup[3]
 
-        log.debug("An active URL is: " + url)
         urls.append(url)
 
-    log.debug("List of active URLs is: " + str(urls))
+    #log.debug("List of active URLs is: " + str(urls))
         
     for url in urls:
         shouldTryAgain = True
@@ -481,18 +480,23 @@ def updateActiveUrlsFromHtml(htmlTup, isFirstURL):
     
     url = htmlTup[0]
     html = htmlTup[1]
+
+    log.debug("URL is: " + url)
     
     soup = BeautifulSoup(html, 'html5lib')
     mainTable = soup.find("table", {"class" : "SUGtableouter"})
     if mainTable == None and isFirstURL == True:
         # URL should be set to inactive.
-        log.info("Could not find a HTML table with class SUGtableouter, " + \
-                 "which is our main table which contains all the shifts." + \
-                 "Since this is the first URL for this iteration of " + \
-                 "parsing URLs, this URL will be marked as inactive in " + \
-                 "future loops.  If further investigation is desired, " + \
-                 "please see the HTML log for the HTML encountered.  " + \
-                 "URL is: " + url)
+        #
+        # Could not find a HTML table with class SUGtableouter
+        # which is our main table which contains all the shifts.
+        # Since this is the first URL for this iteration of
+        # parsing URLs, this URL will be marked as inactive in
+        # future loops.  If further investigation is desired,
+        # please see the HTML log for the HTML encountered.
+        #
+        log.debug("URL is active and should be inactive.")
+        log.info("Setting URL to inactive: " + url)
         htmlLog.info("HTML text is: " + html)
         updUtcDttm = datetime.datetime.utcnow().isoformat()
         activeInd = "0"
@@ -501,11 +505,12 @@ def updateActiveUrlsFromHtml(htmlTup, isFirstURL):
                        "where url = ?",
                         values)
         conn.commit()
-        log.debug("Done setting URL to inactive: " + url)
+        log.info("Done setting URL to inactive.")
     
     elif mainTable is not None:
         # URL is still active.
-        log.debug("Found mainTable.  URL is still active: " + url)
+        log.debug("Found mainTable, therefore this URL is still active.")
+        log.debug("Now examining URLs in the nav tabs ...")
         
         # Get URLs from the page.
         navTabs = soup.find("ul", {"class" : "nav-tabs"})
@@ -562,7 +567,7 @@ def updateActiveUrlsFromHtml(htmlTup, isFirstURL):
                         cursor.execute("insert into urls values (?, ?, ?, ?)",
                                        values)
                         conn.commit()
-                        log.debug("Done setting URL to active.")
+                        log.info("Done setting URL to active.")
                         
                     elif len(tups) == 1:
                         # URL was stored previously.
@@ -585,7 +590,7 @@ def updateActiveUrlsFromHtml(htmlTup, isFirstURL):
                                             "where url = ?",
                                             values)
                             conn.commit()
-                            log.debug("Done setting URL to active")
+                            log.info("Done setting URL to active.")
                         else:
                             log.error("Unknown activeInd encountered: " + 
                                         str(activeInd))
@@ -597,7 +602,8 @@ def updateActiveUrlsFromHtml(htmlTup, isFirstURL):
 
     else:
         log.debug("After examining the HTML for this page, we determined " + \
-                  "there's no need to take any action updating any URLs.")
+                  "there's no need to take any action updating any URLs " + \
+                  "to active status or to inactive status.")
         
     
 def getShiftsFromHtml(htmlTup, isFirstURL=False):
