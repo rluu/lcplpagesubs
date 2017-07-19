@@ -61,6 +61,12 @@ LOG_CONFIG_FILE = \
                                  "conf" + os.sep +
                                  "logging.conf"))
 
+# Seed URL on the very first load of the application
+# (when the 'urls' database table has not been created yet).
+# The 'seedUrl' should be the earliest in time (left-most tab URL).
+baseUrl = "http://www.signupgenius.com/go/"
+seedUrl = baseUrl + "4090D4AAEAF2BA7F58-page8"
+
 # For logging.
 # Logging config file specifies the log filename relative to the current
 # directory, so we need to chdir to the SRC_DIR before loading the logging
@@ -199,7 +205,34 @@ def initializeDatabase():
         "row_number text, " +
         "status text)")
     conn.commit()
+    cursor.execute("create table if not exists urls " +
+        "(crte_utc_dttm text, " +
+        "upd_utc_dttm text, " +
+        "url text, " +
+        "active_ind text)")
+    conn.commit()
 
+    # If the 'urls' table is empty, then add a seed URL.
+    activeInd = "1"
+    values = (activeInd,)
+    cursor.execute("select * from urls where " + \
+                   "active_ind = ?",
+                   values)
+    tups = cursor.fetchall()
+    log.debug("Fetched " + str(len(tups)) + " rows from the database.")
+    
+    if len(tups) == 0:
+        log.info("Seeding active URLs with initial URL: " + seedUrl)
+        
+        crteUtcDttm = datetime.datetime.utcnow().isoformat()
+        updUtcDttm = crteUtcDttm
+        activeInd = "1"
+        values = (crteUtcDttm, updUtcDttm, seedUrl, activeInd)
+        cursor.execute("insert into urls values (?, ?, ?, ?)",
+                       values)
+        conn.commit()
+        log.debug("Done.")
+        
     
 def initializeTwilio():
     """
@@ -310,17 +343,48 @@ def getHtmlPages():
             htmls.append(html)
             return htmls
     ######################
+    # Old style way of hard-coding URLs.
+    if False:
+        urls = [
+            #"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page5",
+            #"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page6",
+            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page7",
+            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page8",
+            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page11",
+            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page12",
+            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page13",
+            ]
+    ######################
     
-    urls = [
-        #"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page5",
-        #"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page6",
-        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page7",
-        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page8",
-        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page11",
-        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page12",
-        "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page13",
-        ]
+    # Get list of active URLs from the database.
+    activeInd = "1"
+    values = (activeInd,)
+    cursor.execute("select * from urls where " + \
+                   "active_ind = ? " + \
+                   "order by upd_utc_dttm asc",
+                   values)
+    tups = cursor.fetchall()
+    log.debug("Fetched " + str(len(tups)) + \
+              " rows from the 'urls' database table.")
+    
+    if len(tups) == 0:
+        log.error("No active URLs were found in the database.  " + \
+                  "Please investigate.")
+        shutdown(1)
 
+    urls = []
+    for tup in tups:
+        log.debug("Looking at: " + str(tup))
+        crteUtcDttm = tup[0]
+        updUtcDttm = tup[1]
+        url = tup[2]
+        activeInd = tup[3]
+
+        log.debug("An active URL is: " + url)
+        urls.append(url)
+
+    log.debug("List of active URLs is: " + str(urls))
+        
     for url in urls:
         shouldTryAgain = True
         while shouldTryAgain:
@@ -396,7 +460,147 @@ def getHtmlPages():
     return htmls
 
 
-def getShiftsFromHtml(htmlTup):
+def updateActiveUrlsFromHtml(htmlTup, isFirstURL):
+    """
+    Reads the input html str, and from the contents, does the following:
+
+      - Determines the URLs that should be active.
+      - Determines the URLs that should not be active.
+      - Update the database table 'urls' to be representative of the 
+        desired active and inactive URLs.
+
+    Arguments:
+
+    htmlTup - tuple containing two entries.  
+        First entry is the URL
+        Second entry is the HTML text to parse.
+
+    isFirstURL - bool containing True if it is the 
+                 first URL being analyzed in the list.
+    """
+    
+    url = htmlTup[0]
+    html = htmlTup[1]
+    
+    soup = BeautifulSoup(html, 'html5lib')
+    mainTable = soup.find("table", {"class" : "SUGtableouter"})
+    if mainTable == None and isFirstURL == True:
+        # URL should be set to inactive.
+        log.info("Could not find a HTML table with class SUGtableouter, " + \
+                 "which is our main table which contains all the shifts." + \
+                 "Since this is the first URL for this iteration of " + \
+                 "parsing URLs, this URL will be marked as inactive in " + \
+                 "future loops.  If further investigation is desired, " + \
+                 "please see the HTML log for the HTML encountered.  " + \
+                 "URL is: " + url)
+        htmlLog.info("HTML text is: " + html)
+        updUtcDttm = datetime.datetime.utcnow().isoformat()
+        activeInd = "0"
+        values = (updUtcDttm, activeInd, url)
+        cursor.execute("update urls set upd_utc_dttm = ?, active_ind = ? " + \
+                       "where url = ?",
+                        values)
+        conn.commit()
+        log.debug("Done setting URL to inactive: " + url)
+    
+    elif mainTable is not None:
+        # URL is still active.
+        log.debug("Found mainTable.  URL is still active: " + url)
+        
+        # Get URLs from the page.
+        navTabs = soup.find("ul", {"class" : "nav-tabs"})
+        if navTabs == None:
+            log.error("Could not find a <ul> element with CSS class " + \
+                      "'nav-tabs' when one was expected.  " + \
+                      "Please investigate further.  " + \
+                      "HTML will be logged to the HTML log.")
+            htmlLog.error("HTML text is: " + html)
+            shutdown(1)
+        else:
+            aElements = []
+            for li in navTabs.findAll("li", recursive=False):
+                htmlLog.debug("A <li> of navTabs is: " + li.prettify())
+                for a in li.findAll("a", recursive=False):
+                    htmlLog.debug("A <a> of <li> is: " + a.prettify())
+                    aElements.append(a)
+
+            for a in aElements:
+                htmlLog.debug("Looking at <a>: " + a.prettify())
+                onClickValue = a["onclick"]
+
+                if onClickValue.find("checkFormChanges") == -1:
+                    log.error("Could not find the expected javascript " + \
+                              "method name in the 'onclick' attribute.  " + \
+                              "Please investigate further.  " + \
+                              "Logging HTML to the HTML log.")
+                    htmlLog.error(html)
+                    shutdown(1)
+                    
+                splittedValues = onClickValue.split("'")
+                if len(splittedValues) == 3:
+                    pageName = splittedValues[1]
+                    navTabUrl = baseUrl + pageName
+                    log.debug("URL assembled from the nav tab is: " + navTabUrl)
+
+                    values = (navTabUrl,)
+                    
+                    cursor.execute("select * from urls where " + \
+                                   "url = ? " + \
+                                   "order by upd_utc_dttm desc limit 1",
+                                   values)
+
+                    tups = cursor.fetchall()
+                    
+                    if len(tups) == 0:
+                        # Initial time seeing this URL.
+                        log.debug("Initial time seeing this URL.")
+                        log.info("Setting URL to active: " + navTabUrl)
+                        crteUtcDttm = datetime.datetime.utcnow().isoformat()
+                        updUtcDttm = crteUtcDttm
+                        activeInd = "1"
+                        values = (crteUtcDttm, updUtcDttm, navTabUrl, activeInd)
+                        cursor.execute("insert into urls values (?, ?, ?, ?)",
+                                       values)
+                        conn.commit()
+                        log.debug("Done setting URL to active.")
+                        
+                    elif len(tups) == 1:
+                        # URL was stored previously.
+                        log.debug("URL was stored previously.")
+                        tup = tups[0]
+                        activeIndColumn = 3
+                        activeInd = tup[activeIndColumn]
+                        if str(activeInd) == "1":
+                            log.debug("URL is active and should stay active.")
+                        elif str(activeInd) == "0":
+                            log.debug("URL is inactive and should be active.")
+                            log.info("Setting URL to active: " + navTabUrl)
+                            
+                            updUtcDttm = datetime.datetime.utcnow().isoformat()
+                            activeInd = "1"
+                            values (updUtcDttm, activeInd, navTabUrl)
+                            cursor.execute("update urls set " + \
+                                            "upd_utc_dttm = ?, " + \
+                                            "active_ind = ? " + \
+                                            "where url = ?",
+                                            values)
+                            conn.commit()
+                            log.debug("Done setting URL to active")
+                        else:
+                            log.error("Unknown activeInd encountered: " + 
+                                        str(activeInd))
+                            shutdown(1)
+                    else:
+                        log.error("Unexpected number of rows for urls.  " + \
+                                  "len(tups) == " + str(len(tups)))
+                        shutdown(1)
+
+    else:
+        log.debug("After examining the HTML for this page, we determined " + \
+                  "there's no need to take any action updating any URLs.")
+        
+    
+def getShiftsFromHtml(htmlTup, isFirstURL=False):
     """
     Reads the input html str, and extracts the shifts.
 
@@ -418,12 +622,12 @@ def getShiftsFromHtml(htmlTup):
     mainTable = soup.find("table", {"class" : "SUGtableouter"})
     if mainTable == None:
         log.warn("Could not find a HTML table with class SUGtableouter, " + \
-                  "which is our main table which contains all the shifts." + \
-                  "  Please see the HTML log for the HTML encountered.")
+                 "which is our main table which contains all the shifts." + \
+                 "  Please see the HTML log for the HTML encountered.")
         htmlLog.warn("HTML text is: " + html)
         log.warn("Returning an empty list of shifts for this HTML page.")
         return shifts
-
+    
     #htmlLog.debug("mainTable is: " + mainTable.prettify())
     mainTableBody = mainTable.find("tbody")
 
@@ -688,6 +892,17 @@ if __name__ == "__main__":
             
                 newShiftsAvailableForSignup.extend(\
                     getNewShiftsAvailableForSignup(shifts))
+                
+                log.info("Updating active URLs from HTML page (i == " + \
+                         str(i) + ") (url == " + url + ")...")
+
+                isFirstUrl = None
+                if i == 0:
+                    isFirstUrl = True
+                else:
+                    isFirstUrl = False
+                    
+                updateActiveUrlsFromHtml(htmlPage, isFirstUrl)
                 
             log.info("There are " + str(len(newShiftsAvailableForSignup)) + \
                      " new shifts available for signup since we last checked.")
