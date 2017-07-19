@@ -899,7 +899,8 @@ if __name__ == "__main__":
                 newShiftsAvailableForSignup.extend(\
                     getNewShiftsAvailableForSignup(shifts))
                 
-                log.info("Updating active URLs from HTML page (i == " + \
+                log.info("Checking in this HTML page for any changes " + \
+                         "to what URLs are active (i == " + \
                          str(i) + ") (url == " + url + ")...")
 
                 isFirstUrl = None
