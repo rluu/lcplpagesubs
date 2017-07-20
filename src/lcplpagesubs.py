@@ -16,6 +16,8 @@ from requests.exceptions import RequestException
 from requests.exceptions import ConnectionError
 import time
 import boto3
+import botocore
+from botocore.exceptions import EndpointConnectionError
 from twilio.rest import Client
 from bs4 import BeautifulSoup
 
@@ -131,32 +133,44 @@ def sendAdminNotificationEmail(emailSubject = "", emailBodyHtml = ""):
                  ").")
         log.debug("emailSubject: " + emailSubject + \
                 ", emailBodyHtml: " + emailBodyHtml)
-        
-        client = boto3.client('ses')
-        response = client.send_email(
-            Destination={
-                'ToAddresses': [toEmailAddress],
-                'CcAddresses': [],
-                'BccAddresses': []
-                },
-            Message={
-                'Subject': {
-                    'Data': emailSubject,
-                    'Charset': 'UTF-8'
-                },
-                'Body': {
-                    'Html': {
-                        'Data': emailBodyHtml,
-                        'Charset': 'UTF-8'
-                        }
-                    }
-                },
-            Source=fromEmailAddress,
-            )
-        
-        log.info("Sending email done.")
-        log.info("Response from AWS is: " + str(response))
-        
+
+        shouldTryAgain = True
+        while shouldTryAgain:
+            shouldTryAgain = False
+            try:
+                client = boto3.client('ses')
+                response = client.send_email(
+                    Destination={
+                        'ToAddresses': [toEmailAddress],
+                        'CcAddresses': [],
+                        'BccAddresses': []
+                        },
+                    Message={
+                        'Subject': {
+                            'Data': emailSubject,
+                            'Charset': 'UTF-8'
+                        },
+                        'Body': {
+                            'Html': {
+                                'Data': emailBodyHtml,
+                                'Charset': 'UTF-8'
+                                }
+                            }
+                        },
+                    Source=fromEmailAddress,
+                    )
+                
+                log.info("Sending email done.")
+                log.info("Response from AWS is: " + str(response))
+            except EndpointConnectionError as e:
+                log.error("Caught EndpointConnectionError: " + str(e))
+                
+                shouldTryAgain = True
+                numSeconds = 60
+                log.info("Retry in " + str(numSeconds) + " seconds ...")
+                time.sleep(numSeconds)
+                
+                
 def shutdown(rc):
     """
     Exits the script, but first flushes all logging handles, etc.
@@ -433,6 +447,14 @@ def getHtmlPages():
                     sendAdminNotificationEmail(emailSubject, emailBodyHtml)
                     shutdown(1)
                     
+            except ConnectionError as e:
+                log.error("Caught ConnectionError: " + str(e))
+                
+                shouldTryAgain = True
+                numSeconds = 60
+                log.info("Retry in " + str(numSeconds) + " seconds ...")
+                time.sleep(numSeconds)
+                
             except RequestException as e:
                 log.error("URL: " + url)
                 log.error("Caught RequestException: " + str(e))
