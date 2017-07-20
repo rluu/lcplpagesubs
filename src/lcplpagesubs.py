@@ -19,7 +19,8 @@ import boto3
 import botocore
 from botocore.exceptions import EndpointConnectionError
 from twilio.rest import Client
-from twilio.rest.exceptions import TwilioRestException
+from twilio.base.exceptions import TwilioException
+from twilio.base.exceptions import TwilioRestException
 from bs4 import BeautifulSoup
 
 ##############################################################################
