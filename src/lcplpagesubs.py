@@ -19,6 +19,7 @@ import boto3
 import botocore
 from botocore.exceptions import EndpointConnectionError
 from twilio.rest import Client
+from twilio.rest.exceptions import TwilioRestException
 from bs4 import BeautifulSoup
 
 ##############################################################################
@@ -820,30 +821,42 @@ def sendEmailNotificationMessage(newShiftsAvailableForSignup):
 
     log.info("Sending notice email to: " + str(toEmailAddresses))
         
-    client = boto3.client('ses')
-    response = client.send_email(
-        Destination={
-            'ToAddresses': [],
-            'CcAddresses': [],
-            'BccAddresses': toEmailAddresses
-            },
-        Message={
-            'Subject': {
-                'Data': emailSubject,
-                'Charset': 'UTF-8'
-            },
-            'Body': {
-                'Html': {
-                    'Data': emailBodyHtml,
-                    'Charset': 'UTF-8'
-                    }
-                }
-            },
-        Source=fromEmailAddress,
-        )
-        
-    log.info("Sending email done.")
-    log.info("Response from AWS is: " + str(response))
+    shouldTryAgain = True
+    while shouldTryAgain:
+        shouldTryAgain = False
+        try:
+            client = boto3.client('ses')
+            response = client.send_email(
+                Destination={
+                    'ToAddresses': [],
+                    'CcAddresses': [],
+                    'BccAddresses': toEmailAddresses
+                    },
+                Message={
+                    'Subject': {
+                        'Data': emailSubject,
+                        'Charset': 'UTF-8'
+                    },
+                    'Body': {
+                        'Html': {
+                            'Data': emailBodyHtml,
+                            'Charset': 'UTF-8'
+                            }
+                        }
+                    },
+                Source=fromEmailAddress,
+                )
+                
+            log.info("Sending email done.")
+            log.info("Response from AWS is: " + str(response))
+        except EndpointConnectionError as e:
+            log.error("Caught EndpointConnectionError: " + str(e))
+                
+            shouldTryAgain = True
+            numSeconds = 60
+            log.info("Retry in " + str(numSeconds) + " seconds ...")
+            time.sleep(numSeconds)
+                
     
 def sendTextNotificationMessage(newShiftsAvailableForSignup):
     """
@@ -871,18 +884,38 @@ def sendTextNotificationMessage(newShiftsAvailableForSignup):
     global twilioAuthToken
     global sourcePhoneNumber
     global destinationPhoneNumber
-    
-    client = Client(twilioAccountSid, twilioAuthToken)
 
-    log.info("Sending text message from phone number " +
-                sourcePhoneNumber + " to phone number " +
-                destinationPhoneNumber + " with message body: " + msg)
-    
-    client.messages.create(from_=sourcePhoneNumber,
-                           to=destinationPhoneNumber,
-                           body=msg)
+    if twilioAccountSid is None or twilioAccountSid.strip() == "":
+        log.error("twilioAccountSid may not be empty.")
+        shutdown(1)
 
-    log.info("Sending text message done.")
+    if twilioAuthToken is None or twilioAuthToken.strip() == "":
+        log.error("twilioAuthToken may not be empty.")
+        shutdown(1)
+
+    try:
+        client = Client(twilioAccountSid, twilioAuthToken)
+    
+        log.info("Sending text message from phone number " +
+                    sourcePhoneNumber + " to phone number " +
+                    destinationPhoneNumber + " with message body: " + msg)
+
+        client.messages.create(from_=sourcePhoneNumber,
+                               to=destinationPhoneNumber,
+                               body=msg)
+        
+        log.info("Sending text message done.")
+        
+    except TwilioRestException as e:
+        log.error("Caught TwilioRestException: " + str(e))
+        shutdown(1)
+    except TwilioException as e:
+        log.error("Caught TwilioException: " + str(e))
+        shutdown(1)
+    except BaseException as e:
+        log.error("Caught BaseException: " + str(e))
+        shutdown(1)
+        
 
 
 ##############################################################################
