@@ -377,7 +377,7 @@ def getHtmlPages():
     values = (activeInd,)
     cursor.execute("select * from urls where " + \
                    "active_ind = ? " + \
-                   "order by upd_utc_dttm asc",
+                   "order by crte_utc_dttm asc",
                    values)
     tups = cursor.fetchall()
     log.debug("Fetched " + str(len(tups)) + \
