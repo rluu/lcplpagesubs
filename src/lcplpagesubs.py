@@ -607,7 +607,7 @@ def updateActiveUrlsFromHtml(htmlTup, isFirstURL):
                             
                             updUtcDttm = datetime.datetime.utcnow().isoformat()
                             activeInd = "1"
-                            values (updUtcDttm, activeInd, navTabUrl)
+                            values = (updUtcDttm, activeInd, navTabUrl)
                             cursor.execute("update urls set " + \
                                             "upd_utc_dttm = ?, " + \
                                             "active_ind = ? " + \
