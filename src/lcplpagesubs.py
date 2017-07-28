@@ -352,6 +352,7 @@ def getUrls():
             "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page12",
             "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page13",
             ]
+        return urls
     ######################
             
     # Get list of active URLs from the database.
