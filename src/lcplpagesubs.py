@@ -333,15 +333,75 @@ def initializeAlertEmailAddresses():
         alertToEmailAddresses = alertToEmailAddressesStr.split(",")
         log.info("alertToEmailAddresses is: " + str(alertToEmailAddresses))
 
+def getUrls():
+    """
+    Returns a list of str, each str containing a URL.
+    """
         
-def getHtmlPages():
+    urls = []
+    
+    ######################
+    # Old style way of hard-coding URLs.
+    if False:
+        urls = [
+            #"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page5",
+            #"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page6",
+            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page7",
+            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page8",
+            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page11",
+            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page12",
+            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page13",
+            ]
+    ######################
+            
+    # Get list of active URLs from the database.
+    activeInd = "1"
+    values = (activeInd,)
+    cursor.execute("select * from urls where " + \
+                   "active_ind = ? " + \
+                   "order by crte_utc_dttm asc",
+                   values)
+    tups = cursor.fetchall()
+    log.debug("Fetched " + str(len(tups)) + \
+              " rows from the 'urls' database table.")
+    
+    if len(tups) == 0:
+        log.error("No active URLs were found in the database.  " + \
+                  "Please investigate.")
+        shutdown(1)
+
+    for tup in tups:
+        log.debug("Looking at 'urls' row: " + str(tup))
+        crteUtcDttm = tup[0]
+        updUtcDttm = tup[1]
+        url = tup[2]
+        activeInd = tup[3]
+
+        urls.append(url)
+
+    #log.debug("List of active URLs is: " + str(urls))
+    return urls
+
+
+def getHtmlPages(urls):
     """
     Returns a list of tuples.  
     Each tuple contains the following:
       - str containing the URL
       - str containing the contents of a HTML page.
+
+    Arguments:
+    urls - list of str, each str containing a URL.
     """
-    
+
+    if urls is None:
+        log.error("Input parameter 'urls' may not be None.")
+        shutdown(1)
+    if not isinstance(urls, list):
+        log.error("Input parameter 'urls' must be of type list.  " + \
+                  "urls is: " + str(urls))
+        shutdown(1)
+            
     htmls = []
 
     ######################
@@ -359,47 +419,7 @@ def getHtmlPages():
             htmls.append(html)
             return htmls
     ######################
-    # Old style way of hard-coding URLs.
-    if False:
-        urls = [
-            #"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page5",
-            #"http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page6",
-            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page7",
-            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page8",
-            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page11",
-            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page12",
-            "http://www.signupgenius.com/go/4090d4aaeaf2ba7f58-page13",
-            ]
-    ######################
     
-    # Get list of active URLs from the database.
-    activeInd = "1"
-    values = (activeInd,)
-    cursor.execute("select * from urls where " + \
-                   "active_ind = ? " + \
-                   "order by crte_utc_dttm asc",
-                   values)
-    tups = cursor.fetchall()
-    log.debug("Fetched " + str(len(tups)) + \
-              " rows from the 'urls' database table.")
-    
-    if len(tups) == 0:
-        log.error("No active URLs were found in the database.  " + \
-                  "Please investigate.")
-        shutdown(1)
-
-    urls = []
-    for tup in tups:
-        log.debug("Looking at 'urls' row: " + str(tup))
-        crteUtcDttm = tup[0]
-        updUtcDttm = tup[1]
-        url = tup[2]
-        activeInd = tup[3]
-
-        urls.append(url)
-
-    #log.debug("List of active URLs is: " + str(urls))
-        
     for url in urls:
         shouldTryAgain = True
         while shouldTryAgain:
@@ -937,7 +957,8 @@ if __name__ == "__main__":
     while True:
         try:
             log.info("Fetching HTML pages ...")
-            htmlPages = getHtmlPages()
+            urls = getUrls()
+            htmlPages = getHtmlPages(urls)
             log.info("Fetching HTML pages done.  " + \
                      "Got " + str(len(htmlPages)) + " HTML pages total.")
             
