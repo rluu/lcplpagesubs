@@ -530,7 +530,9 @@ def updateActiveUrlsFromHtml(htmlTup, isFirstURL):
     
     soup = BeautifulSoup(html, 'html5lib')
     mainTable = soup.find("table", {"class" : "SUGtableouter"})
-    if mainTable == None and isFirstURL == True:
+    navTabs = soup.find("ul", {"class" : "nav-tabs"})
+    
+    if (mainTable == None or navTabs == None) and isFirstURL == True:
         # URL should be set to inactive.
         #
         # Could not find a HTML table with class SUGtableouter
