@@ -54,7 +54,7 @@ python3 src/serverstatus.py --host=0.0.0.0 --port=5000 --debug
 
 # Production environment (must be started from src directory):
 cd src
-gunicorn --workers=2 --bind=0.0.0.0:5000 --log-config=../conf/logging.conf wsgi
+gunicorn --workers=2 --timeout=60 --bind=0.0.0.0:5000 --log-config=../conf/logging.conf wsgi
 ```
 
 
